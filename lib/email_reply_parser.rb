@@ -106,7 +106,10 @@ class EmailReplyParser
           start_para
           @para.is_signature = !!(stripped =~ /^[\-|_]/)
         end
-        @para.update(stripped)
+        stripped.gsub! /\s[^\w\s]+\s/, ' '
+        stripped.gsub! /\s+/, ' '
+        stripped.downcase!
+        @para.update stripped
       end
     end
 
