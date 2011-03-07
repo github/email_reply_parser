@@ -9,6 +9,13 @@ require dir + '..' + 'lib' + 'email_reply_parser'
 EMAIL_FIXTURE_PATH = dir + 'emails'
 
 class EmailReplyParserTest < Test::Unit::TestCase
+  def test_marks_nothing_hidden_on_a_single_reply_thread
+    replies = [email(:email_1_2)]
+    parsed  = EmailReplyParser.read(replies)
+    assert_equal 1, parsed.size
+    assert parsed[0].paragraphs.none? { |para| para.hidden? }
+  end
+
   def test_reads_simple_body
     body   = email :email_1_1
     blocks = EmailReplyParser::Reply.new(body).blocks

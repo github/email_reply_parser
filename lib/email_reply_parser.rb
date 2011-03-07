@@ -3,6 +3,10 @@ require 'digest/sha1'
 require 'set'
 
 class EmailReplyParser
+  def self.read(replies)
+    replies = replies.map { |text| Reply.new(text) }
+  end
+
   class Reply
     attr_reader :blocks, :shas
 
@@ -106,7 +110,11 @@ class EmailReplyParser
     end
 
     def signature?
-      self.is_signature
+      is_signature
+    end
+
+    def hidden?
+      is_hidden
     end
 
     def update(s)
