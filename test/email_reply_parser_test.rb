@@ -13,7 +13,19 @@ class EmailReplyParserTest < Test::Unit::TestCase
     replies = [email(:email_1_2)]
     parsed  = EmailReplyParser.read(replies)
     assert_equal 1, parsed.size
-    assert parsed[0].paragraphs.none? { |para| para.hidden? }
+    assert parsed[0].blocks.none? { |b|
+      b.paragraphs.any? { |para| para.hidden? } }
+  end
+
+  def test_marks_common_reply_portions_hidden_on_thread
+    replies = [email(:email_1_1), email(:email_1_2)]
+    parsed  = EmailReplyParser.read(replies)
+    assert_equal 2, parsed.size
+    assert parsed[0].blocks.none? { |b|
+      b.paragraphs.any? { |para| para.hidden? } }
+    assert parsed[1].blocks[4].paragraphs.first.hidden?
+    assert parsed[1].blocks[3].paragraphs.all? { |p| p.hidden? }
+    assert parsed[1].blocks[2].paragraphs.none? { |p| p.hidden? }
   end
 
   def test_reads_simple_body

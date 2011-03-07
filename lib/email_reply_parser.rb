@@ -3,17 +3,22 @@ require 'digest/sha1'
 require 'set'
 
 class EmailReplyParser
-  def self.read(replies)
-    replies = replies.map { |text| Reply.new(text) }
+  def self.read(bodies, replies = [])
+    shas = (r = replies.last && r.shas)
+    bodies.map do |text|
+      r = Reply.new(text, shas)
+      shas = r.shas
+      r
+    end
   end
 
   class Reply
     attr_reader :blocks, :shas
 
-    def initialize(text)
-      @blocks = []
-      block   = nil
-      @shas   = Set.new
+    def initialize(text, shas = Set.new)
+      @blocks  = []
+      block    = nil
+      @shas    = shas || Set.new
       scanner  = StringScanner.new(text)
       while line = scanner.scan_until(/\n/)
         line.rstrip!
@@ -30,6 +35,21 @@ class EmailReplyParser
         block << line
       end
       @blocks.last.finish if @blocks.size > 0
+      scan_for_hidden
+    end
+
+  private
+    def scan_for_hidden
+      @blocks.reverse.each do |block|
+        block.paragraphs.reverse.each do |para|
+          if !(para.is_hidden = (
+                block.reply? ||
+                (para.signature? && @shas.include?(para.sha))
+              ))
+            return
+          end
+        end
+      end
     end
   end
 
@@ -39,7 +59,7 @@ class EmailReplyParser
     def initialize(options = {})
       @levels = options[:levels].to_i
       @lines  = []
-      @shas   = options[:shas] ||Set.new
+      @shas   = options[:shas] || Set.new
       @paras  = []
       @line   = -1  # current line number
       @para   = nil # current paragraph
@@ -96,7 +116,7 @@ class EmailReplyParser
 
     def end_para(ending_line = @line)
       return if !@para
-      @shas << @para.finish(ending_line)
+      @shas << @para.finish(ending_line).sha
       @para = nil
     end
   end
@@ -123,7 +143,7 @@ class EmailReplyParser
 
     def finish(ending_line)
       self.end = ending_line
-      self.sha = @sha.to_s
+      self.sha = self.sha.to_s
       self
     end
   end
