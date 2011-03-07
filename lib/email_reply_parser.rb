@@ -65,6 +65,14 @@ class EmailReplyParser
       @line   = -1  # current line number
       @para   = nil # current paragraph
       @joined = nil
+      @hidden = nil
+    end
+
+    def hidden?
+      if @hidden.nil?
+        @hidden = (p = @paras.first and p.hidden?) || false
+      end
+      @hidden
     end
 
     def reply?

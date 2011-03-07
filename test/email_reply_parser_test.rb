@@ -23,9 +23,9 @@ class EmailReplyParserTest < Test::Unit::TestCase
     assert_equal 2, parsed.size
     assert parsed[0].blocks.none? { |b|
       b.paragraphs.any? { |para| para.hidden? } }
-    assert parsed[1].blocks[4].paragraphs.first.hidden?
-    assert parsed[1].blocks[3].paragraphs.all? { |p| p.hidden? }
-    assert parsed[1].blocks[2].paragraphs.none? { |p| p.hidden? }
+    assert  parsed[1].blocks[4].hidden?
+    assert  parsed[1].blocks[3].hidden?
+    assert !parsed[1].blocks[2].hidden?
   end
 
   def test_reads_simple_body
