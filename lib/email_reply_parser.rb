@@ -5,8 +5,7 @@ require 'set'
 class EmailReplyParser
   VERSION = "0.1.0"
 
-  def self.read(bodies, replies = [])
-    shas = (r = replies.last && r.shas)
+  def self.read(bodies, shas = nil)
     bodies.map do |text|
       r = Reply.new(text, shas)
       shas = r.shas
@@ -17,7 +16,7 @@ class EmailReplyParser
   class Reply
     attr_reader :blocks, :shas
 
-    def initialize(text, shas = Set.new)
+    def initialize(text, shas = nil)
       @blocks  = []
       block    = nil
       @shas    = shas || Set.new
