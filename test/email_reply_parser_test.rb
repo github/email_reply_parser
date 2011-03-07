@@ -11,28 +11,28 @@ EMAIL_FIXTURE_PATH = dir + 'emails'
 class EmailReplyParserTest < Test::Unit::TestCase
   def test_reads_simple_body
     body   = email :email_1_1
-    blocks = EmailReplyParser.scan(body)
+    blocks = EmailReplyParser::Reply.new(body).blocks
     assert_equal 1, blocks.size
     assert_match /Hi folks/, blocks.first.to_s
   end
 
   def test_reads_bottom_poster
     body   = email :email_1_2
-    blocks = EmailReplyParser.scan(body)
+    blocks = EmailReplyParser::Reply.new(body).blocks
     assert_equal 5, blocks.size
     assert_equal [0,1,0,1,0], blocks.map { |b| b.levels }
   end
 
   def test_reads_multi_level_replies
     body   = email :email_1_3
-    blocks = EmailReplyParser.scan(body)
+    blocks = EmailReplyParser::Reply.new(body).blocks
     assert_equal 7, blocks.size
     assert_equal [0,1,2,1,2,1,0], blocks.map { |b| b.levels }
   end
 
   def test_stores_shas_of_blocks
     body   = email :email_1_3
-    blocks = EmailReplyParser.scan(body)
+    blocks = EmailReplyParser::Reply.new(body).blocks
     assert_equal 19, blocks.inject(0) { |n, b| n + b.paragraphs.size }
     assert_equal 1,  blocks[6].paragraphs.size
     # check for the repeated mailing list footer
@@ -48,7 +48,7 @@ class EmailReplyParserTest < Test::Unit::TestCase
 
   def test_tracks_signature_blocks
     body  = email :email_1_1
-    block = EmailReplyParser.scan(body).first
+    block = EmailReplyParser::Reply.new(body).blocks.first
     assert_equal 4, block.paragraphs.size
     block.paragraphs.each do |para|
       if para.start == 6

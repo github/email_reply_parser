@@ -3,13 +3,39 @@ require 'digest/sha1'
 require 'set'
 
 class EmailReplyParser
+  class Reply
+    attr_reader :blocks, :shas
+
+    def initialize(text)
+      @blocks = []
+      block   = nil
+      @shas   = Set.new
+      scanner  = StringScanner.new(text)
+      while line = scanner.scan_until(/\n/)
+        line.rstrip!
+        line_levels = 0
+        if line =~ /^(>+)/
+          line_levels = $1.size
+        end
+        if !block || block.levels != line_levels
+          block.finish if block
+          @blocks << (block = Block.new(
+            :levels => line_levels,
+            :shas   => shas))
+        end
+        block << line
+      end
+      @blocks.last.finish if @blocks.size > 0
+    end
+  end
+
   class Block
     attr_reader :levels
 
-    def initialize(levels = 0)
-      @levels = levels
+    def initialize(options = {})
+      @levels = options[:levels].to_i
       @lines  = []
-      @shas   = Set.new
+      @shas   = options[:shas] ||Set.new
       @paras  = []
       @line   = -1  # current line number
       @para   = nil # current paragraph
@@ -71,11 +97,12 @@ class EmailReplyParser
     end
   end
 
-  class Paragraph < Struct.new(:start, :end, :is_signature, :sha)
+  class Paragraph < Struct.new(:start, :end, :sha, :is_signature, :is_hidden)
     def initialize(s = 0)
       super
       self.sha = Digest::SHA1.new
       self.is_signature = false
+      self.is_hidden    = false
     end
 
     def signature?
@@ -91,26 +118,5 @@ class EmailReplyParser
       self.sha = @sha.to_s
       self
     end
-  end
-
-public
-  def self.scan(text)
-    blocks = []
-    block  = nil
-    scanner = StringScanner.new(text)
-    while line = scanner.scan_until(/\n/)
-      line.rstrip!
-      line_levels = 0
-      if line =~ /^(>+)/
-        line_levels = $1.size
-      end
-      if !block || block.levels != line_levels
-        block.finish if block
-        blocks << (block = Block.new(line_levels))
-      end
-      block << line
-    end
-    blocks.last.finish if blocks.size > 0
-    blocks
   end
 end
