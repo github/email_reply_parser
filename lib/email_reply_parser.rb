@@ -3,6 +3,8 @@ require 'digest/sha1'
 require 'set'
 
 class EmailReplyParser
+  VERSION = "0.1.0"
+
   def self.read(bodies, replies = [])
     shas = (r = replies.last && r.shas)
     bodies.map do |text|
