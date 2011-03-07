@@ -3,7 +3,7 @@ require 'digest/sha1'
 
 class EmailReplyParser
   class Block
-    attr_reader :levels, :shas, :repeated, :lines
+    attr_reader :levels, :shas
 
     def initialize(levels = 0)
       @levels = levels
@@ -43,6 +43,9 @@ class EmailReplyParser
         end_sha(@line-1)
       else
         start_sha
+        if stripped =~ /^[\-|_]/
+          @shas[:current][:signature] = true
+        end
         @sha.update(stripped)
       end
     end

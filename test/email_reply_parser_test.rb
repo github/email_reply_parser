@@ -35,8 +35,28 @@ class EmailReplyParserTest < Test::Unit::TestCase
     blocks = EmailReplyParser.scan(body)
     assert_equal 19, blocks.inject(0) { |n, b| n + b.shas.size }
     assert_equal 1,  blocks[6].shas.size
+    # check for the repeated mailing list footer
     blocks[6].shas.each do |sha, hash|
-      assert blocks[4].shas.key?(sha)
+      assert hash[:signature], "only para of block 6 is not a signature"
+      assert blocks[4].shas[sha][:signature],
+        "matching sha in para 4 is not a signature"
+    end
+  end
+
+  def test_tracks_signature_blocks
+    body  = email :email_1_1
+    block = EmailReplyParser.scan(body).first
+    assert_equal 4, block.shas.size
+    block.shas.each do |sha, hash|
+      if hash[:start] == 6
+        assert_equal 6, hash[:end]
+        assert hash[:signature], "para on line 6 is not a signature"
+      elsif hash[:start] == 9
+        assert_equal 12, hash[:end]
+        assert hash[:signature], "para on line 9 is not a signature"
+      else
+        assert !hash[:signature], "para on line #{hash[:start]} is a signature"
+      end
     end
   end
 
