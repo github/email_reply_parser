@@ -1,26 +1,36 @@
 require 'strscan'
 require 'digest/sha1'
+require 'set'
 
 class EmailReplyParser
   class Block
-    attr_reader :levels, :shas
+    attr_reader :levels
 
     def initialize(levels = 0)
       @levels = levels
       @lines  = []
-      @joined = nil
-      @shas   = {}  # sha => {:start => 0, :end => 1}
-      @sha    = nil # current sha
+      @shas   = Set.new
+      @paras  = []
       @line   = -1  # current line number
-    end
-
-    def <<(line)
-      update_paragraph_sha(line)
-      @lines << line
+      @para   = nil # current paragraph
+      @joined = nil
     end
 
     def reply?
       @levels > 0
+    end
+
+    def paragraphs
+      @paras
+    end
+
+    def <<(line)
+      update_paragraph(line)
+      @lines << line
+    end
+
+    def include?(sha)
+      @shas.include?(sha)
     end
 
     def to_s
@@ -28,7 +38,7 @@ class EmailReplyParser
     end
 
     def finish
-      end_sha
+      end_para
     end
 
     def inspect
@@ -36,33 +46,50 @@ class EmailReplyParser
     end
 
   private
-    def update_paragraph_sha(line)
+    def update_paragraph(line)
       @line   += 1
       stripped = line.sub(/^(\s|>)+/, '')
       if stripped.size.zero?
-        end_sha(@line-1)
+        end_para(@line-1)
       else
-        start_sha
-        if stripped =~ /^[\-|_]/
-          @shas[:current][:signature] = true
+        if !@para
+          start_para
+          @para.is_signature = !!(stripped =~ /^[\-|_]/)
         end
-        @sha.update(stripped)
+        @para.update(stripped)
       end
     end
 
-    def start_sha
-      if @sha.nil?
-        @shas[:current] = {:start => @line}
-      end
-      @sha ||= Digest::SHA1.new
+    def start_para
+      @paras << (@para = Paragraph.new(@line))
     end
 
-    def end_sha(ending_line = @line)
-      if @sha
-        @shas[@sha.hexdigest] = @shas.delete(:current).
-          update(:end => ending_line)
-      end
-      @sha = nil
+    def end_para(ending_line = @line)
+      return if !@para
+      @shas << @para.finish(ending_line)
+      @para = nil
+    end
+  end
+
+  class Paragraph < Struct.new(:start, :end, :is_signature, :sha)
+    def initialize(s = 0)
+      super
+      self.sha = Digest::SHA1.new
+      self.is_signature = false
+    end
+
+    def signature?
+      self.is_signature
+    end
+
+    def update(s)
+      self.sha.update(s)
+    end
+
+    def finish(ending_line)
+      self.end = ending_line
+      self.sha = @sha.to_s
+      self
     end
   end
 

@@ -33,12 +33,15 @@ class EmailReplyParserTest < Test::Unit::TestCase
   def test_stores_shas_of_blocks
     body   = email :email_1_3
     blocks = EmailReplyParser.scan(body)
-    assert_equal 19, blocks.inject(0) { |n, b| n + b.shas.size }
-    assert_equal 1,  blocks[6].shas.size
+    assert_equal 19, blocks.inject(0) { |n, b| n + b.paragraphs.size }
+    assert_equal 1,  blocks[6].paragraphs.size
     # check for the repeated mailing list footer
-    blocks[6].shas.each do |sha, hash|
-      assert hash[:signature], "only para of block 6 is not a signature"
-      assert blocks[4].shas[sha][:signature],
+    blocks[6].paragraphs.each do |para|
+      last = blocks[4].paragraphs.last
+      assert_equal para.sha, last.sha
+      assert last.include?(para.sha)
+      assert para.signature?, "only para of block 6 is not a signature"
+      assert last.signature?,
         "matching sha in para 4 is not a signature"
     end
   end
@@ -46,18 +49,19 @@ class EmailReplyParserTest < Test::Unit::TestCase
   def test_tracks_signature_blocks
     body  = email :email_1_1
     block = EmailReplyParser.scan(body).first
-    assert_equal 4, block.shas.size
-    block.shas.each do |sha, hash|
-      if hash[:start] == 6
-        assert_equal 6, hash[:end]
-        assert hash[:signature], "para on line 6 is not a signature"
-      elsif hash[:start] == 9
-        assert_equal 12, hash[:end]
-        assert hash[:signature], "para on line 9 is not a signature"
+    assert_equal 4, block.paragraphs.size
+    block.paragraphs.each do |para|
+      if para.start == 6
+        assert_equal 6, para.end
+        assert para.signature?, "para on line 6 is not a signature"
+      elsif para.start == 9
+        assert_equal 12, para.end
+        assert para.signature?, "para on line 9 is not a signature"
       else
-        assert !hash[:signature], "para on line #{hash[:start]} is a signature"
+        assert !para.signature?, "para on line #{para.start} is a signature"
       end
     end
+    assert block.paragraphs.last.signature?
   end
 
   def email(name)
