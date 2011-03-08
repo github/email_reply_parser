@@ -10,22 +10,19 @@ EMAIL_FIXTURE_PATH = dir + 'emails'
 
 class EmailReplyParserTest < Test::Unit::TestCase
   def test_marks_nothing_hidden_on_a_single_reply_thread
-    replies = [email(:email_1_2)]
-    parsed  = EmailReplyParser.read(replies)
-    assert_equal 1, parsed.size
-    assert parsed[0].blocks.none? { |b|
+    reply = EmailReplyParser.read(email(:email_1_2))
+    assert reply.blocks.none? { |b|
       b.paragraphs.any? { |para| para.hidden? } }
   end
 
   def test_marks_common_reply_portions_hidden_on_thread
-    replies = [email(:email_1_1), email(:email_1_2)]
-    parsed  = EmailReplyParser.read(replies)
-    assert_equal 2, parsed.size
-    assert parsed[0].blocks.none? { |b|
+    reply1 = EmailReplyParser.read(email(:email_1_1))
+    reply2 = EmailReplyParser.read(email(:email_1_2), reply1.shas)
+    assert reply1.blocks.none? { |b|
       b.paragraphs.any? { |para| para.hidden? } }
-    assert  parsed[1].blocks[4].hidden?
-    assert  parsed[1].blocks[3].hidden?
-    assert !parsed[1].blocks[2].hidden?
+    assert  reply2.blocks[4].hidden?
+    assert  reply2.blocks[3].hidden?
+    assert !reply2.blocks[2].hidden?
   end
 
   def test_reads_simple_body

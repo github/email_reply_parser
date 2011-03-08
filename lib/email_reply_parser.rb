@@ -5,12 +5,8 @@ require 'set'
 class EmailReplyParser
   VERSION = "0.1.0"
 
-  def self.read(bodies, shas = nil)
-    bodies.map do |text|
-      r = Reply.new(text, shas)
-      shas = r.shas
-      r
-    end
+  def self.read(body, shas = nil)
+    Reply.new(body, shas)
   end
 
   class Reply
