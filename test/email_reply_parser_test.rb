@@ -25,6 +25,15 @@ class EmailReplyParserTest < Test::Unit::TestCase
     assert !reply2.blocks[2].hidden?
   end
 
+  def test_marks_empty_block_between_two_hidden_blocks_as_hidden
+    reply1 = EmailReplyParser.read("abc def\n\n-signature")
+    reply2 = EmailReplyParser.read("wat\n\n>> abc def\n>\n\n-signature", reply1.shas)
+    assert_equal 4, reply2.blocks.size
+    assert reply2.blocks[3].hidden?
+    assert reply2.blocks[1].hidden?
+    assert reply2.blocks[2].hidden?
+  end
+
   def test_reads_simple_body
     body   = email :email_1_1
     blocks = EmailReplyParser::Reply.new(body).blocks

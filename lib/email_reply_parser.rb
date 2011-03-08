@@ -13,37 +13,59 @@ class EmailReplyParser
     attr_reader :blocks, :shas
 
     def initialize(text, shas = nil)
-      @blocks  = []
-      block    = nil
-      @shas    = shas || Set.new
-      scanner  = StringScanner.new(text)
-      while line = scanner.scan_until(/\n/)
-        line.rstrip!
-        line_levels = 0
-        if line =~ /^(>+)/
-          line_levels = $1.size
-        end
-        if !block || block.levels != line_levels
-          block.finish if block
-          @blocks << (block = Block.new(
-            :levels => line_levels,
-            :shas   => shas))
-        end
-        block << line
+      @blocks = []
+      @block  = nil
+
+      # add this reply's shas to the given shas Set
+      @shas = shas || Set.new
+
+      # check if this reply's blocks are hidden with with the unmodified
+      # sha Set.  This reply's own repeat blocks can't mark itself as hidden.
+      @current_shas = @shas.dup
+
+      @scanner = StringScanner.new(text)
+      while line = @scanner.scan_until(/\n/)
+        scan_line(line)
       end
+
+      if (last_line = @scanner.rest.to_s).size > 0
+        scan_line(last_line)
+      end
+
       @blocks.last.finish if @blocks.size > 0
+
       scan_for_hidden
+      @block = @scanner = @current_shas = nil
     end
 
   private
+    def scan_line(line)
+      line.rstrip!
+      line_levels = 0
+      if line =~ /^(>+)/
+        line_levels = $1.size
+      end
+      if !@block || @block.levels != line_levels
+        @block.finish if @block
+        @blocks << (@block = Block.new(
+          :levels => line_levels,
+          :shas   => @shas))
+      end
+      @block << line
+    end
+
     def scan_for_hidden
       @blocks.reverse.each do |block|
-        block.paragraphs.reverse.each do |para|
-          if !(para.is_hidden = (
-                block.reply? ||
-                (para.signature? && @shas.include?(para.sha))
-              ))
-            return
+        if block.paragraphs.empty?
+          block.is_hidden = true
+        else
+          block.paragraphs.reverse.each do |para|
+            if !(para.is_hidden = (
+                  block.reply? ||
+                  (para.signature? && @current_shas.include?(para.sha))
+                ))
+              return
+            end
           end
         end
       end
@@ -62,6 +84,10 @@ class EmailReplyParser
       @para   = nil # current paragraph
       @joined = nil
       @hidden = nil
+    end
+
+    def is_hidden=(bool)
+      @hidden = !!bool
     end
 
     def hidden?
