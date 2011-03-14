@@ -3,6 +3,11 @@ require 'strscan'
 class EmailReplyParser
   VERSION = "0.2.0"
 
+  # Splits an email body into a list of Fragments.
+  #
+  # text - A String email body.
+  #
+  # Returns an Email instance.
   def self.read(text)
     Email.new.read(text)
   end
@@ -14,6 +19,13 @@ class EmailReplyParser
       @fragments = []
     end
 
+    # Splits the given text into a list of Fragments.  This is roughly done by
+    # reversing the text and parsing from the bottom to the top.  This way we
+    # can check for 'On <date>, <author> wrote:' lines above quoted blocks.
+    #
+    # text - A String email body.
+    #
+    # Returns this same Email instance.
     def read(text)
       text.reverse!
       @found_visible = false
@@ -36,6 +48,13 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
+
+    # Scans the given line of text and figures out which fragment it belongs
+    # to.
+    #
+    # line - A String line of text from the email.
+    #
+    # Returns nothing.
     def scan_line(line)
       line.chomp!("\n")
       line.lstrip!
@@ -58,10 +77,18 @@ class EmailReplyParser
       end
     end
 
+    # Detects if a given line is a header above a quoted area.  It is only
+    # checked for lines preceding quoted regions.
+    #
+    # line - A String line of text from the email.
+    #
+    # Returns true if the line is a valid header, or false.
     def quote_header?(line)
       line =~ /^:etorw.*nO$/
     end
 
+    # Builds the fragment string and reverses it, after all lines have been
+    # added.  It also checks to see if this fragment is hidden.
     def finish_fragment
       if @fragment
         @fragment.finish
@@ -79,6 +106,9 @@ class EmailReplyParser
     end
   end
 
+  # Represents a group of paragraphs in the email sharing common attributes.
+  # Paragraphs should get their own fragment if they are a quoted area or a
+  # signature.
   class Fragment < Struct.new(:quoted, :signature, :hidden)
     attr_reader :lines, :content
 
@@ -94,8 +124,12 @@ class EmailReplyParser
     alias signature? signature
     alias hidden?    hidden
 
+    # Builds the string content by joining the lines and reversing them.
+    #
+    # Returns nothing.
     def finish
       @content = @lines.join("\n")
+      @lines = nil
       @content.reverse!
     end
 
