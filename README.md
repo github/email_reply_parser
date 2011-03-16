@@ -1,3 +1,4 @@
 # Email Reply Parser
 
-TBA
+EmailReplyParser is a small library to parse plain text email content.
+

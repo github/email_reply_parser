@@ -1,5 +1,14 @@
 require 'strscan'
 
+# EmailReplyParser is a small library to parse plain text email content.  The
+# goal is to identify which fragments are quoted, part of a signature, or
+# original body content.  We want to support both top and bottom posters, so
+# no simple "REPLY ABOVE HERE" content is used.
+#
+# Beyond RFC 5322 (which is handled by the [Ruby mail gem][mail]), there aren't
+# any real standards for how emails are created.
+#
+# [mail]: https://github.com/mikel/mail
 class EmailReplyParser
   VERSION = "0.2.0"
 
@@ -12,6 +21,7 @@ class EmailReplyParser
     Email.new.read(text)
   end
 
+  # An Email instance represents a parsed body String.
   class Email
     attr_reader :fragments
 
