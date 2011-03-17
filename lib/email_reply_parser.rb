@@ -6,7 +6,27 @@ require 'strscan'
 # no simple "REPLY ABOVE HERE" content is used.
 #
 # Beyond RFC 5322 (which is handled by the [Ruby mail gem][mail]), there aren't
-# any real standards for how emails are created.
+# any real standards for how emails are created.  This attempts to parse out
+# common conventions for things like replies:
+#
+#     this is some text
+#
+#     On <date>, <author> wrote:
+#     > blah blah
+#     > blah blah
+#
+# ... and signatures:
+#
+#     this is some text
+#
+#     -- 
+#     Bob
+#     http://homepage.com/~bob
+#
+# Each of these are parsed into Fragment objects.
+#
+# EmailReplyParser also attempts to figure out which of these blocks should
+# be hidden from users.
 #
 # [mail]: https://github.com/mikel/mail
 class EmailReplyParser
@@ -21,8 +41,11 @@ class EmailReplyParser
     Email.new.read(text)
   end
 
+  ### Emails
+
   # An Email instance represents a parsed body String.
   class Email
+    # Emails have an Array of Fragments.
     attr_reader :fragments
 
     def initialize
@@ -37,27 +60,46 @@ class EmailReplyParser
     #
     # Returns this same Email instance.
     def read(text)
+      # The text is reversed initially due to the way we check for hidden
+      # fragments.
       text.reverse!
+
+      # This determines if any 'visible' Fragment has been found.  Once any
+      # visible Fragment is found, stop looking for hidden ones.
       @found_visible = false
+
+      # This instance variable points to the current Fragment.  If the matched
+      # line fits, it should be added to this Fragment.  Otherwise, finish it
+      # and start a new Fragment.
       @fragment = nil
+
+      # Use the StringScanner to pull out each line of the email content.
       @scanner  = StringScanner.new(text)
       while line = @scanner.scan_until(/\n/)
         scan_line(line)
       end
 
+      # Be sure to parse the last line of the email.
       if (last_line = @scanner.rest.to_s).size > 0
         scan_line(last_line)
       end
 
+      # Finish up the final fragment.  Finishing a fragment will detect any
+      # attributes (hidden, signature, reply), and join each line into a 
+      # string.
       finish_fragment
 
       @scanner = @fragment = nil
+
+      # Now that parsing is done, reverse the order.
       @fragments.reverse!
       self
     end
 
   private
     EMPTY = "".freeze
+
+    ### Line-by-Line Parsing
 
     # Scans the given line of text and figures out which fragment it belongs
     # to.
@@ -68,8 +110,13 @@ class EmailReplyParser
     def scan_line(line)
       line.chomp!("\n")
       line.lstrip!
+
+      # We're looking for leading `>`'s to see if this line is part of a
+      # quoted Fragment.
       line_levels = line =~ /(>+)$/ ? $1.size : 0
 
+      # Mark the current Fragment as a signature if the current line is empty
+      # and the Fragment starts with a common signature indicator.
       if @fragment && line == EMPTY
         if @fragment.lines.last =~ /[\-\_]$/
           @fragment.signature = true
@@ -77,10 +124,15 @@ class EmailReplyParser
         end
       end
 
+      # If the line matches the current fragment, add it.  Note that a common
+      # reply header also counts as part of the quoted Fragment, even though
+      # it doesn't start with `>`.
       if @fragment &&
           ((@fragment.quoted? != line_levels.zero?) ||
            (@fragment.quoted? && quote_header?(line)))
         @fragment.lines << line
+
+      # Otherwise, finish the fragment and start a new one.
       else
         finish_fragment
         @fragment = Fragment.new(!line_levels.zero?, line)
@@ -98,7 +150,27 @@ class EmailReplyParser
     end
 
     # Builds the fragment string and reverses it, after all lines have been
-    # added.  It also checks to see if this fragment is hidden.
+    # added.  It also checks to see if this Fragment is hidden.  The hidden
+    # Fragment check reads from the bottom to the top.
+    #
+    # Any quoted Fragments or signature Fragments are marked hidden if they
+    # are below any visible Fragments.  Visible Fragments are expected to
+    # contain original content by the author.  If they are below a quoted
+    # Fragment, then the Fragment should be visible to give context to the
+    # reply.
+    #
+    #     some original text (visible)
+    #
+    #     > do you have any two's? (quoted, visible)
+    #
+    #     Go fish! (visible)
+    #
+    #     > -- 
+    #     > Player 1 (quoted, hidden)
+    #
+    #     -- 
+    #     Player 2 (signature, hidden)
+    #
     def finish_fragment
       if @fragment
         @fragment.finish
@@ -116,11 +188,19 @@ class EmailReplyParser
     end
   end
 
+  ### Fragments
+
   # Represents a group of paragraphs in the email sharing common attributes.
   # Paragraphs should get their own fragment if they are a quoted area or a
   # signature.
   class Fragment < Struct.new(:quoted, :signature, :hidden)
-    attr_reader :lines, :content
+    # This is an Array of String lines of content.  Since the content is
+    # reversed, this array is backwards, and contains reversed strings.
+    attr_reader :lines,
+
+    # This is reserved for the joined String that is build when this Fragment
+    # is finished.
+      :content
 
     def initialize(quoted, first_line)
       self.signature = self.hidden = false
