@@ -113,7 +113,7 @@ class EmailReplyParser
 
       # We're looking for leading `>`'s to see if this line is part of a
       # quoted Fragment.
-      line_levels = line =~ /(>+)$/ ? $1.size : 0
+      is_quoted = !!(line =~ /(>+)$/)
 
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
@@ -128,14 +128,14 @@ class EmailReplyParser
       # reply header also counts as part of the quoted Fragment, even though
       # it doesn't start with `>`.
       if @fragment &&
-          ((@fragment.quoted? != line_levels.zero?) ||
+          ((@fragment.quoted? == is_quoted) ||
            (@fragment.quoted? && quote_header?(line)))
         @fragment.lines << line
 
       # Otherwise, finish the fragment and start a new one.
       else
         finish_fragment
-        @fragment = Fragment.new(!line_levels.zero?, line)
+        @fragment = Fragment.new(is_quoted, line)
       end
     end
 
