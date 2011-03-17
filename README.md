@@ -7,7 +7,16 @@ This is what GitHub uses to display comments that were created from
 email replies.  This code is being open sourced in an effort to
 crowdsource the quality of our email representation.
 
-See more at http://help.github.com/code/email_reply_parser/
+See more at the [Rocco docs][rocco].
+
+[rocco]: http://help.github.com/code/email_reply_parser/
+
+## Problem?
+
+If you have a question about the behavior and formatting of email replies on GitHub, check out [support][support].  If you have a specific issue regarding this library, then hit up the [Issues][issues].
+
+[support]: http://support.github.com/
+[issues]: https://github.com/github/email_reply_parser/issues
 
 ## Installation
 
