@@ -69,7 +69,6 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match /^Awesome/, reply.fragments[0].to_s
     assert_match /^On/,      reply.fragments[1].to_s
     assert_match /Loader/,   reply.fragments[1].to_s
-    puts reply.fragments[1].to_s.inspect
   end
 
   def email(name)

@@ -13,8 +13,8 @@ Gem::Specification.new do |s|
   ## If your rubyforge_project name is different, then edit it and comment out
   ## the sub! line in the Rakefile
   s.name              = 'email_reply_parser'
-  s.version           = '0.2.0'
-  s.date              = '2011-03-17'
+  s.version           = '0.3.0'
+  s.date              = '2011-08-23'
   s.rubyforge_project = 'email_reply_parser'
 
   ## Make sure your summary is short. The description may be as long
@@ -68,6 +68,7 @@ Gem::Specification.new do |s|
     test/emails/email_1_1.txt
     test/emails/email_1_2.txt
     test/emails/email_1_3.txt
+    test/emails/email_1_4.txt
   ]
   # = MANIFEST =
 
