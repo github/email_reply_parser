@@ -74,7 +74,7 @@ class EmailReplyParser
       @fragment = nil
 
       # Use the StringScanner to pull out each line of the email content.
-      @scanner  = StringScanner.new(text)
+      @scanner = StringScanner.new(text)
       while line = @scanner.scan_until(/\n/)
         scan_line(line)
       end
@@ -129,7 +129,7 @@ class EmailReplyParser
       # it doesn't start with `>`.
       if @fragment &&
           ((@fragment.quoted? == is_quoted) ||
-           (@fragment.quoted? && quote_header?(line)))
+           (@fragment.quoted? && (quote_header?(line) || line == EMPTY)))
         @fragment.lines << line
 
       # Otherwise, finish the fragment and start a new one.

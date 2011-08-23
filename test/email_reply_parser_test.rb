@@ -63,6 +63,15 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match /^_/, reply.fragments[5].to_s
   end
 
+  def test_recognizes_date_string_above_quote
+    reply = email :email_1_4
+
+    assert_match /^Awesome/, reply.fragments[0].to_s
+    assert_match /^On/,      reply.fragments[1].to_s
+    assert_match /Loader/,   reply.fragments[1].to_s
+    puts reply.fragments[1].to_s.inspect
+  end
+
   def email(name)
     body = IO.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
     EmailReplyParser.read body
