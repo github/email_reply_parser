@@ -19,7 +19,7 @@ require 'strscan'
 #
 #     this is some text
 #
-#     -- 
+#     --
 #     Bob
 #     http://homepage.com/~bob
 #
@@ -85,7 +85,7 @@ class EmailReplyParser
       end
 
       # Finish up the final fragment.  Finishing a fragment will detect any
-      # attributes (hidden, signature, reply), and join each line into a 
+      # attributes (hidden, signature, reply), and join each line into a
       # string.
       finish_fragment
 
@@ -118,7 +118,7 @@ class EmailReplyParser
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
       if @fragment && line == EMPTY
-        if @fragment.lines.last =~ /[\-\_]$/
+        if @fragment.lines.last =~ /(--|__|\w-)$/
           @fragment.signature = true
           finish_fragment
         end
@@ -165,10 +165,10 @@ class EmailReplyParser
     #
     #     Go fish! (visible)
     #
-    #     > -- 
+    #     > --
     #     > Player 1 (quoted, hidden)
     #
-    #     -- 
+    #     --
     #     Player 2 (signature, hidden)
     #
     def finish_fragment
