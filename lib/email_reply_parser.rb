@@ -62,7 +62,7 @@ class EmailReplyParser
     def read(text)
       # The text is reversed initially due to the way we check for hidden
       # fragments.
-      text.reverse!
+      text = text.reverse
 
       # This determines if any 'visible' Fragment has been found.  Once any
       # visible Fragment is found, stop looking for hidden ones.
