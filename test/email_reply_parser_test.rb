@@ -77,6 +77,11 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal "The Quick Brown Fox Jumps Over The Lazy Dog", original
   end
 
+  def test_returns_only_the_visible_fragments_as_a_string
+    reply = email(:email_1_2)
+    assert_equal reply.fragments.select{|r| !r.hidden?}.map{|r| r.to_s}.join("\n"), reply.visible_text
+  end
+
   def email(name)
     body = IO.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
     EmailReplyParser.read body
