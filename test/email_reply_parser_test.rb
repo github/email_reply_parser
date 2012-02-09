@@ -87,6 +87,17 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal "Outlook with a reply", EmailReplyParser.parse_reply(body)
   end
 
+  def test_parse_out_sent_from_iPhone
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_iPhone.txt").to_s
+    assert_equal "Here is another email", EmailReplyParser.parse_reply(body)
+  end
+
+  def test_parse_out_sent_from_BlackBerry
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_BlackBerry.txt").to_s
+    assert_equal "Here is another email", EmailReplyParser.parse_reply(body)
+  end
+
+
   def test_parse_reply
     body = IO.read EMAIL_FIXTURE_PATH.join("email_1_2.txt").to_s
     assert_equal EmailReplyParser.read(body).visible_text, EmailReplyParser.parse_reply(body)

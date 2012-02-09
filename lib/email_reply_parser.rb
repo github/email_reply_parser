@@ -107,7 +107,6 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-
     ### Line-by-Line Parsing
 
     # Scans the given line of text and figures out which fragment it belongs
@@ -127,7 +126,7 @@ class EmailReplyParser
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
       if @fragment && line == EMPTY
-        if @fragment.lines.last =~ /[\-\_]\s*$/
+        if @fragment.lines.last =~ /([\-\_]\s*$)|(^\w+ #{"Sent from my".reverse}$)/
           @fragment.signature = true
           finish_fragment
         end
