@@ -41,6 +41,10 @@ class EmailReplyParser
     Email.new.read(text)
   end
 
+  def self.parse_reply(text)
+    self.read(text).visible_text
+  end
+
   ### Emails
 
   # An Email instance represents a parsed body String.
