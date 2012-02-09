@@ -78,8 +78,13 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
   end
 
   def test_returns_only_the_visible_fragments_as_a_string
-    reply = email(:email_1_2)
-    assert_equal reply.fragments.select{|r| !r.hidden?}.map{|r| r.to_s}.join("\n"), reply.visible_text
+    reply = email(:email_2_1)
+    assert_equal reply.fragments.select{|r| !r.hidden?}.map{|r| r.to_s}.join("\n").rstrip, reply.visible_text
+  end
+
+  def test_parse_out_just_top_for_outlook_reply
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_2_1.txt").to_s
+    assert_equal "Outlook with a reply", EmailReplyParser.parse_reply(body)
   end
 
   def test_parse_reply

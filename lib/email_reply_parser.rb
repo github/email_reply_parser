@@ -58,7 +58,7 @@ class EmailReplyParser
 
 
     def visible_text
-      fragments.select{|f| !f.hidden?}.map{|f| f.to_s}.join("\n")
+      fragments.select{|f| !f.hidden?}.map{|f| f.to_s}.join("\n").rstrip
     end
 
     # Splits the given text into a list of Fragments.  This is roughly done by
@@ -127,7 +127,7 @@ class EmailReplyParser
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
       if @fragment && line == EMPTY
-        if @fragment.lines.last =~ /[\-\_]$/
+        if @fragment.lines.last =~ /[\-\_]\s*$/
           @fragment.signature = true
           finish_fragment
         end
