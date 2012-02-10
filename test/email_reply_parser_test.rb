@@ -97,6 +97,16 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal "Here is another email", EmailReplyParser.parse_reply(body)
   end
 
+  def test_parse_out_send_from_multiword_mobile_device
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_multi_word_sent_from_my_mobile_device.txt").to_s
+    assert_equal "Here is another email", EmailReplyParser.parse_reply(body)
+  end
+
+  def test_do_not_parse_out_send_from_in_regular_sentence
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_sent_from_my_not_signature.txt").to_s
+    assert_equal "Here is another email\n\nSent from my desk, is much easier then my mobile phone.", EmailReplyParser.parse_reply(body)
+  end
+
 
   def test_parse_reply
     body = IO.read EMAIL_FIXTURE_PATH.join("email_1_2.txt").to_s
