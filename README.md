@@ -8,9 +8,12 @@ email replies.
 
 The parsing of replies and signatures is much more robust in this version (outlook, hotmail, yahoo, gmail, iPhone, Andriod).
 
-See githubs docs at the [Rocco docs][rocco].
+## Usage
 
-[rocco]: http://help.github.com/code/email_reply_parser/
+The simpliest way to use the gem is:
+
+`parsed_body = EmailReplyParser.parse_reply(email_body)`
+
 
 ## Problem?
 
@@ -27,13 +30,6 @@ Get it from [GitHub][github] or in your Rails 3 bundler file:
 `gem 'email_reply_parser', :git => 'git://github.com/drewB/email_reply_parser.git'`
 
 [github]: https://github.com/drewB/email_reply_parser.git'
-
-## Usage
-
-The simpliest way to use the gem is:
-
-`parsed_body = EmailReplyParser.parse_reply(email_body)`
-
 
 ## Known Issues
 
