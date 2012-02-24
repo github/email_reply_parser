@@ -29,7 +29,7 @@ Get it from [GitHub][github] or in your Rails 3 bundler file:
 
 `gem 'email_reply_parser', :git => 'git://github.com/drewB/email_reply_parser.git'`
 
-[github]: https://github.com/drewB/email_reply_parser.git'
+[github]: https://github.com/drewB/email_reply_parser/zipball/master
 
 ## Known Issues
 
