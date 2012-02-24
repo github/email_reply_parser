@@ -17,16 +17,14 @@ See githubs docs at the [Rocco docs][rocco].
 If you have a specific issue regarding this library, then hit up the [Issues][issues].
 
 [support]: http://support.github.com/
-[issues]: https://github.com/github/email_reply_parser/issues
+[issues]: https://github.com/drewB/email_reply_parser/issues
 
 ## Installation
 
 Get it from [GitHub][github] or in your Rails 3 bundler file:
 
 
-gem 'email_reply_parser', :git => 'git://github.com/drewB/email_reply_parser.git'
-
-`gem install email_reply_parser`.  Run `rake` to run the tests.
+`gem 'email_reply_parser', :git => 'git://github.com/drewB/email_reply_parser.git'`
 
 [github]: https://github.com/drewB/email_reply_parser.git'
 
@@ -76,16 +74,4 @@ Not everyone follows this convention:
 
 
 
-### Strange Quoting
 
-Apparently, prefixing lines with `>` isn't universal either:
-
-    Hello
-
-    --
-    Rick
-
-    ________________________________________
-    From: Bob [reply@reply.github.com]
-    Sent: Monday, March 14, 2011 6:16 PM
-    To: Rick
