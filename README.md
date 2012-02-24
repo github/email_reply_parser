@@ -28,6 +28,13 @@ Get it from [GitHub][github] or in your Rails 3 bundler file:
 
 [github]: https://github.com/drewB/email_reply_parser.git'
 
+## Usage
+
+The simpliest way to use the gem is:
+
+`parsed_body = EmailReplyParser.parse_reply(email_body)`
+
+
 ## Known Issues
 
 ### Quoted Headers
