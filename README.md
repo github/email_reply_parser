@@ -24,12 +24,9 @@ If you have a specific issue regarding this library, then hit up the [Issues][is
 
 ## Installation
 
-Get it from [GitHub][github] or in your Rails 3 bundler file:
-
+Use in your Rails 3 bundler file:
 
 `gem 'email_reply_parser', :git => 'git://github.com/drewB/email_reply_parser.git'`
-
-[github]: https://github.com/drewB/email_reply_parser/zipball/master
 
 ## Known Issues
 
