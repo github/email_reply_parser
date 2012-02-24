@@ -126,7 +126,7 @@ class EmailReplyParser
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
       if @fragment && line == EMPTY
-        if @fragment.lines.last =~ /([\-\_]\s*$)|(^(\w+\s*){1,3} #{"Sent from my".reverse}$)/  #will catch up to 3 words after "sent from my "
+        if @fragment.lines.last =~ /(--|__|\w-$)|(^(\w+\s*){1,3} #{"Sent from my".reverse}$)/  #will catch up to 3 words after "sent from my "
           @fragment.signature = true
           finish_fragment
         end

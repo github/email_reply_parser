@@ -107,6 +107,11 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal "Here is another email\n\nSent from my desk, is much easier then my mobile phone.", EmailReplyParser.parse_reply(body)
   end
 
+  def test_retains_bullets
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_bullets.txt").to_s
+    assert_equal "test 2 this should list second\n\nand have spaces\n\nand retain this formatting\n\n\n   - how about bullets\n   - and another", 
+      EmailReplyParser.parse_reply(body)
+      end
 
   def test_parse_reply
     body = IO.read EMAIL_FIXTURE_PATH.join("email_1_2.txt").to_s
