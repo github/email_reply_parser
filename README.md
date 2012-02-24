@@ -3,44 +3,32 @@
 EmailReplyParser is a small library to parse plain text email content.
 See the rocco-documented source code for specifics on how it works.
 
-This is what GitHub uses to display comments that were created from
-email replies.  This code is being open sourced in an effort to
-crowdsource the quality of our email representation.
+This was forked from what GitHub uses to display comments that were created from
+email replies.  
 
-See more at the [Rocco docs][rocco].
+The parsing of replies and signatures is much more robust in this version (outlook, hotmail, yahoo, gmail, iPhone, Andriod).
+
+See githubs docs at the [Rocco docs][rocco].
 
 [rocco]: http://help.github.com/code/email_reply_parser/
 
 ## Problem?
 
-If you have a question about the behavior and formatting of email replies on GitHub, check out [support][support].  If you have a specific issue regarding this library, then hit up the [Issues][issues].
+If you have a specific issue regarding this library, then hit up the [Issues][issues].
 
 [support]: http://support.github.com/
 [issues]: https://github.com/github/email_reply_parser/issues
 
 ## Installation
 
-Get it from [GitHub][github] or `gem install email_reply_parser`.  Run `rake` to run the tests.
+Get it from [GitHub][github] or in your Rails 3 bundler file:
 
-[github]: https://github.com/github/email_reply_parser
 
-## Contribute
+gem 'email_reply_parser', :git => 'git://github.com/drewB/email_reply_parser.git'
 
-If you'd like to hack on EmailReplyParser, start by forking the repo on GitHub:
+`gem install email_reply_parser`.  Run `rake` to run the tests.
 
-https://github.com/github/email_reply_parser
-
-The best way to get your changes merged back into core is as follows:
-
-* Clone down your fork
-* Create a thoughtfully named topic branch to contain your change
-* Hack away
-* Add tests and make sure everything still passes by running rake
-* If you are adding new functionality, document it in the README
-* Do not change the version number, I will do that on my end
-* If necessary, rebase your commits into logical chunks, without errors
-* Push the branch up to GitHub
-* Send a pull request to the `github/email_reply_parser` project.
+[github]: https://github.com/drewB/email_reply_parser.git'
 
 ## Known Issues
 
