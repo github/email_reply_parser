@@ -19,7 +19,7 @@ require 'strscan'
 #
 #     this is some text
 #
-#     -- 
+#     --
 #     Bob
 #     http://homepage.com/~bob
 #
@@ -30,9 +30,9 @@ require 'strscan'
 #
 # [mail]: https://github.com/mikel/mail
 class EmailReplyParser
-  VERSION = "0.3.0"
+  VERSION = "0.5.0"
 
-  # Splits an email body into a list of Fragments.
+  # Public: Splits an email body into a list of Fragments.
   #
   # text - A String email body.
   #
@@ -41,6 +41,11 @@ class EmailReplyParser
     Email.new.read(text)
   end
 
+  # Public: Get the text of the visible portions of the given email body.
+  #
+  # text - A String email body.
+  #
+  # Returns a String.
   def self.parse_reply(text)
     self.read(text).visible_text
   end
@@ -56,7 +61,9 @@ class EmailReplyParser
       @fragments = []
     end
 
-
+    # Public: Gets the combined text of the visible fragments of the email body.
+    #
+    # Returns a String.
     def visible_text
       fragments.select{|f| !f.hidden?}.map{|f| f.to_s}.join("\n").rstrip
     end
@@ -69,6 +76,13 @@ class EmailReplyParser
     #
     # Returns this same Email instance.
     def read(text)
+      # Check for multi-line reply headers. Some clients break up
+      # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
+      if text =~ /^(On(.+)wrote:)$/m
+        # Remove all new lines from the reply header.
+        text.gsub! $1, $1.gsub("\n", " ")
+      end
+
       # The text is reversed initially due to the way we check for hidden
       # fragments.
       text = text.reverse
@@ -94,7 +108,7 @@ class EmailReplyParser
       end
 
       # Finish up the final fragment.  Finishing a fragment will detect any
-      # attributes (hidden, signature, reply), and join each line into a 
+      # attributes (hidden, signature, reply), and join each line into a
       # string.
       finish_fragment
 
@@ -107,6 +121,8 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
+    SIG_REGEX = /(--|__|\w-$)|(^(\w+\s*){1,3} #{"Sent from my".reverse}$)/
+    
     ### Line-by-Line Parsing
 
     # Scans the given line of text and figures out which fragment it belongs
@@ -117,7 +133,7 @@ class EmailReplyParser
     # Returns nothing.
     def scan_line(line)
       line.chomp!("\n")
-      line.lstrip!
+      line.lstrip! unless line =~ SIG_REGEX
 
       # We're looking for leading `>`'s to see if this line is part of a
       # quoted Fragment.
@@ -126,7 +142,7 @@ class EmailReplyParser
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
       if @fragment && line == EMPTY
-        if @fragment.lines.last =~ /(--|__|\w-$)|(^(\w+\s*){1,3} #{"Sent from my".reverse}$)/  #will catch up to 3 words after "sent from my "
+        if @fragment.lines.last =~ SIG_REGEX
           @fragment.signature = true
           finish_fragment
         end
@@ -173,10 +189,10 @@ class EmailReplyParser
     #
     #     Go fish! (visible)
     #
-    #     > -- 
+    #     > --
     #     > Player 1 (quoted, hidden)
     #
-    #     -- 
+    #     --
     #     Player 2 (signature, hidden)
     #
     def finish_fragment
@@ -240,3 +256,4 @@ class EmailReplyParser
     end
   end
 end
+

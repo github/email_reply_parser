@@ -71,6 +71,30 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match /Loader/,   reply.fragments[1].to_s
   end
 
+  def test_a_complex_body_with_only_one_fragment
+    reply = email :email_1_5
+
+    assert_equal 1, reply.fragments.size
+  end
+
+  def test_reads_email_with_correct_signature
+    reply = email :correct_sig
+    
+    assert_equal 2, reply.fragments.size
+    assert_equal [false, false], reply.fragments.map { |f| f.quoted? }
+    assert_equal [false, true], reply.fragments.map { |f| f.signature? }
+    assert_equal [false, true], reply.fragments.map { |f| f.hidden? }
+    assert_match /^-- \nrick/, reply.fragments[1].to_s
+  end
+
+  def test_deals_with_multiline_reply_headers
+    reply = email :email_1_6
+
+    assert_match /^I get/,   reply.fragments[0].to_s
+    assert_match /^On/,      reply.fragments[1].to_s
+    assert_match /Was this/, reply.fragments[1].to_s
+  end
+
   def test_does_not_modify_input_string
     original = "The Quick Brown Fox Jumps Over The Lazy Dog"
     EmailReplyParser.read original
