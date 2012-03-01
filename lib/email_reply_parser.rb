@@ -41,6 +41,10 @@ class EmailReplyParser
     Email.new.read(text)
   end
 
+  def self.parse_reply(text)
+    self.read(text).visible_text
+  end
+
   ### Emails
 
   # An Email instance represents a parsed body String.
@@ -50,6 +54,11 @@ class EmailReplyParser
 
     def initialize
       @fragments = []
+    end
+
+
+    def visible_text
+      fragments.select{|f| !f.hidden?}.map{|f| f.to_s}.join("\n").rstrip
     end
 
     # Splits the given text into a list of Fragments.  This is roughly done by
@@ -105,8 +114,8 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-    SIG_REGEX = /(\s--|__|\w-)$/
-
+    SIG_REGEX = /(--|__|\w-$)|(^(\w+\s*){1,3} #{"Sent from my".reverse}$)/
+    
     ### Line-by-Line Parsing
 
     # Scans the given line of text and figures out which fragment it belongs
@@ -240,3 +249,4 @@ class EmailReplyParser
     end
   end
 end
+
