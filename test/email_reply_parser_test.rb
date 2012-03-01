@@ -77,6 +77,16 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal 1, reply.fragments.size
   end
 
+  def test_reads_email_with_correct_signature
+    reply = email :correct_sig
+    
+    assert_equal 2, reply.fragments.size
+    assert_equal [false, false], reply.fragments.map { |f| f.quoted? }
+    assert_equal [false, true], reply.fragments.map { |f| f.signature? }
+    assert_equal [false, true], reply.fragments.map { |f| f.hidden? }
+    assert_match /^-- \nrick/, reply.fragments[1].to_s
+  end
+
   def email(name)
     body = IO.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
     EmailReplyParser.read body
