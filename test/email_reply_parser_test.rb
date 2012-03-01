@@ -87,6 +87,20 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match /^-- \nrick/, reply.fragments[1].to_s
   end
 
+  def test_deals_with_multiline_reply_headers
+    reply = email :email_1_6
+
+    assert_match /^I get/,   reply.fragments[0].to_s
+    assert_match /^On/,      reply.fragments[1].to_s
+    assert_match /Was this/, reply.fragments[1].to_s
+  end
+
+  def test_does_not_modify_input_string
+    original = "The Quick Brown Fox Jumps Over The Lazy Dog"
+    EmailReplyParser.read original
+    assert_equal "The Quick Brown Fox Jumps Over The Lazy Dog", original
+  end
+
   def email(name)
     body = IO.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
     EmailReplyParser.read body

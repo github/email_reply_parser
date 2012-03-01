@@ -60,9 +60,16 @@ class EmailReplyParser
     #
     # Returns this same Email instance.
     def read(text)
+      # Check for multi-line reply headers. Some clients break up
+      # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
+      if text =~ /^(On(.+)wrote:)$/m
+        # Remove all new lines from the reply header.
+        text.gsub! $1, $1.gsub("\n", " ")
+      end
+
       # The text is reversed initially due to the way we check for hidden
       # fragments.
-      text.reverse!
+      text = text.reverse
 
       # This determines if any 'visible' Fragment has been found.  Once any
       # visible Fragment is found, stop looking for hidden ones.
