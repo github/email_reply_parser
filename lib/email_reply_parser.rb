@@ -32,7 +32,7 @@ require 'strscan'
 class EmailReplyParser
   VERSION = "0.4.0"
 
-  # Splits an email body into a list of Fragments.
+  # Public: Splits an email body into a list of Fragments.
   #
   # text - A String email body.
   #
@@ -41,6 +41,11 @@ class EmailReplyParser
     Email.new.read(text)
   end
 
+  # Public: Get the text of the visible portions of the given email body.
+  #
+  # text - A String email body.
+  #
+  # Returns a String.
   def self.parse_reply(text)
     self.read(text).visible_text
   end
@@ -56,7 +61,9 @@ class EmailReplyParser
       @fragments = []
     end
 
-
+    # Public: Gets the combined text of the visible fragments of the email body.
+    #
+    # Returns a String.
     def visible_text
       fragments.select{|f| !f.hidden?}.map{|f| f.to_s}.join("\n").rstrip
     end
