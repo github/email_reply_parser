@@ -142,6 +142,42 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal EmailReplyParser.read(body).visible_text, EmailReplyParser.parse_reply(body)
   end
 
+  def test_parse_out_signature_using_from_name
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_no_signature_deliminator.txt").to_s
+    expected_body = "I don't like putting any delimiator in my signature because I think that is cool.\n\nReally it is."
+    assert_equal expected_body, EmailReplyParser.parse_reply(body, "Jim Smith <john.smith@gmail.com>")
+  end
+
+  def test_that_a_sentence_with_my_name_in_it_does_not_become_a_signature
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_mentions_own_name.txt").to_s
+    expected_body = "Hi,\n\nMy name is Jim Smith and I had a question.\n\nWhat do you do?"
+    assert_equal expected_body, EmailReplyParser.parse_reply(body, "Jim Smith <john.smith@gmail.com>")
+  end
+
+  def test_parsing_name_from_address
+    address = "Bob Jones <bob@gmail.com>"
+    email = EmailReplyParser::Email.new
+    assert_equal "Bob Jones", email.send(:parse_name_from_address, address)
+  end
+
+  def test_parsing_name_from_address_with_double_quotes
+    address = "\"Bob Jones\" <bob@gmail.com>"
+    email = EmailReplyParser::Email.new
+    assert_equal "Bob Jones", email.send(:parse_name_from_address, address)
+  end
+
+  def test_parsing_name_from_address_with_single_quotes
+    address = "'Bob Jones' <bob@gmail.com>"
+    email = EmailReplyParser::Email.new
+    assert_equal "Bob Jones", email.send(:parse_name_from_address, address)
+  end
+
+  def test_parsing_name_from_address_with_no_name
+    address = "<bob@gmail.com>"
+    email = EmailReplyParser::Email.new
+    assert_equal "", email.send(:parse_name_from_address, address)
+  end
+
   def email(name)
     body = IO.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
     EmailReplyParser.read body

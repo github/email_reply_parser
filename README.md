@@ -15,7 +15,9 @@ See more at the [Rocco docs][rocco].
 
 To parse reply body:
 
-`parsed_body = EmailReplyParser.parse_reply(email_body)`
+`parsed_body = EmailReplyParser.parse_reply(email_body, from_address)`
+
+from_address is optional.  If included it will attempt to parse out signatures based on the name in the from address (if signature doesn't have a standard deliminator.)
 
 ## Problem?
 
