@@ -154,6 +154,18 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal expected_body, EmailReplyParser.parse_reply(body, "Jim Smith <john.smith@gmail.com>")
   end
 
+  def test_simple_email_with_reply
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_was_showing_as_nothing_visible.txt").to_s
+    expected_body = "One achievement I've had is learning a new technology that allows us
+to keep UI elements and events separated from the software on the
+server side, which should allow for more flexible UI code and
+decreased chances of code becoming a swarm of angry hornets.  I've
+been transparent about the initial increased development time while
+learning the technology."
+
+    assert_equal expected_body, EmailReplyParser.parse_reply(body) 
+  end
+
   def test_parsing_name_from_address
     address = "Bob Jones <bob@gmail.com>"
     email = EmailReplyParser::Email.new
