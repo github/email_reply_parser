@@ -82,6 +82,13 @@ class EmailReplyParser
       # parse out the from name if one exists and save for use later
       @from_name = parse_name_from_address(from_address)
       
+      # Check for multi-line reply headers. Some clients break up
+      # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
+      if text =~ /^(On(.+)wrote:)$/m
+        # Remove all new lines from the reply header.
+        text.gsub! $1, $1.gsub("\n", " ")
+      end
+
       # The text is reversed initially due to the way we check for hidden
       # fragments.
       text = text.reverse

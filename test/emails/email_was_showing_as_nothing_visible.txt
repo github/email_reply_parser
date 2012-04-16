@@ -1,4 +1,4 @@
-On Friday, one achievement I had was learning a new technology that allows us
+One achievement I've had is learning a new technology that allows us
 to keep UI elements and events separated from the software on the
 server side, which should allow for more flexible UI code and
 decreased chances of code becoming a swarm of angry hornets.  I've
