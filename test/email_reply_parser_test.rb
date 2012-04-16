@@ -156,13 +156,23 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
 
   def test_simple_email_with_reply
     body = IO.read EMAIL_FIXTURE_PATH.join("email_was_showing_as_nothing_visible.txt").to_s
-    expected_body = "One achievement I've had is learning a new technology that allows us
+    expected_body = "On Friday, one achievement I had was learning a new technology that allows us
 to keep UI elements and events separated from the software on the
 server side, which should allow for more flexible UI code and
 decreased chances of code becoming a swarm of angry hornets.  I've
 been transparent about the initial increased development time while
 learning the technology."
 
+    assert_equal expected_body, EmailReplyParser.parse_reply(body) 
+  end
+
+  def test_2nd_paragraph_starts_with_on
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_2nd_paragraph_starting_with_on.txt").to_s
+    expected_body = "This emails tests that multiline header fix isn't catching things it shouldn't.
+
+On friday when I tried it didn't work as expect.
+
+This line would have been considered part of the header line."
     assert_equal expected_body, EmailReplyParser.parse_reply(body) 
   end
 
