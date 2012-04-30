@@ -76,6 +76,9 @@ class EmailReplyParser
     #
     # Returns this same Email instance.
     def read(text)
+      # in 1.9 we want to operate on the raw bytes
+      text = text.dup.force_encoding('binary') if text.respond_to?(:force_encoding)
+
       # Check for multi-line reply headers. Some clients break up
       # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
       if text =~ /^(On(.+)wrote:)$/nm
