@@ -78,7 +78,7 @@ class EmailReplyParser
     def read(text)
       # Check for multi-line reply headers. Some clients break up
       # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
-      if text =~ /^(On(.+)wrote:)$/m
+      if text =~ /^(On(.+)wrote:)$/nm
         # Remove all new lines from the reply header.
         text.gsub! $1, $1.gsub("\n", " ")
       end
@@ -98,7 +98,7 @@ class EmailReplyParser
 
       # Use the StringScanner to pull out each line of the email content.
       @scanner = StringScanner.new(text)
-      while line = @scanner.scan_until(/\n/)
+      while line = @scanner.scan_until(/\n/n)
         scan_line(line)
       end
 
@@ -121,8 +121,8 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-    SIG_REGEX = /(--|__|\w-$)|(^(\w+\s*){1,3} #{"Sent from my".reverse}$)/
-    
+    SIG_REGEX = /(--|__|\w-$)|(^(\w+\s*){1,3} #{"Sent from my".reverse}$)/n
+
     ### Line-by-Line Parsing
 
     # Scans the given line of text and figures out which fragment it belongs
@@ -137,7 +137,7 @@ class EmailReplyParser
 
       # We're looking for leading `>`'s to see if this line is part of a
       # quoted Fragment.
-      is_quoted = !!(line =~ /(>+)$/)
+      is_quoted = !!(line =~ /(>+)$/n)
 
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
@@ -170,7 +170,7 @@ class EmailReplyParser
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-      line =~ /^:etorw.*nO$/
+      line =~ /^:etorw.*nO$/n
     end
 
     # Builds the fragment string and reverses it, after all lines have been
