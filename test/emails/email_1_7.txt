@@ -1,0 +1,12 @@
+:+1:
+
+On Tue, Sep 25, 2012 at 8:59 AM, Chris Wanstrath
+<notifications@github.com>wrote:
+
+> Steps 0-2 are in prod. Gonna let them sit for a bit then start cleaning up
+> the old code with 3 & 4.
+>
+> 
+> Reply to this email directly or view it on GitHub.
+>
+>
