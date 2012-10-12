@@ -79,7 +79,7 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
 
   def test_reads_email_with_correct_signature
     reply = email :correct_sig
-    
+
     assert_equal 2, reply.fragments.size
     assert_equal [false, false], reply.fragments.map { |f| f.quoted? }
     assert_equal [false, true], reply.fragments.map { |f| f.signature? }
@@ -141,9 +141,9 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
 
   def test_retains_bullets
     body = IO.read EMAIL_FIXTURE_PATH.join("email_bullets.txt").to_s
-    assert_equal "test 2 this should list second\n\nand have spaces\n\nand retain this formatting\n\n\n   - how about bullets\n   - and another", 
+    assert_equal "test 2 this should list second\n\nand have spaces\n\nand retain this formatting\n\n\n   - how about bullets\n   - and another",
       EmailReplyParser.parse_reply(body)
-      end
+  end
 
   def test_parse_reply
     body = IO.read EMAIL_FIXTURE_PATH.join("email_1_2.txt").to_s
