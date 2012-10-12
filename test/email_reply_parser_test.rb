@@ -150,6 +150,12 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal EmailReplyParser.read(body).visible_text, EmailReplyParser.parse_reply(body)
   end
 
+  def test_one_is_not_on
+    reply = email("email_one_is_not_on")
+    assert_match /One outstanding question/, reply.fragments[0].to_s
+    assert_match /^On Oct 1, 2012/, reply.fragments[1].to_s
+  end
+
   def email(name)
     body = IO.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
     EmailReplyParser.read body

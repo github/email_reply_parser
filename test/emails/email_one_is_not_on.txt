@@ -1,0 +1,55 @@
+Thank, this is really helpful.
+
+One outstanding question I had:
+
+Locally (on development), when I run LocationEvent.first(:conditions => ["user_id=? and date_created>=? and date_created<=?",@user.id.to_s,dateBeg,dateEnd])
+
+The first, time I run the query it is quite long (4+seconds).  The subsequent time it is quite quick (50ms).  I'm assuming this is because it is now cached.  What I don't understand is why the original query is so long?  (The indexing seems to be working).
+
+LocationEvent Load (4235.8ms)  SELECT "location_events".* FROM "location_events" WHERE (user_id=4213 and date_created>='2012-09-25 07:00:00.000000' and date_created<'2012-10-03 07:00:00.000000') LIMIT 1
+  EXPLAIN (0.7ms)  EXPLAIN SELECT "location_events".* FROM "location_events" WHERE (user_id=4213 and date_created>='2012-09-25 07:00:00.000000' and date_created<'2012-10-03 07:00:00.000000') LIMIT 1
+EXPLAIN for: SELECT  "location_events".* FROM "location_events"  WHERE (user_id=4213 and date_created>='2012-09-25 07:00:00.000000' and date_created<'2012-10-03 07:00:00.000000') LIMIT 1
+                                                                           QUERY PLAN
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=0.00..4.85 rows=1 width=80)
+   ->  Index Scan using index_location_events_on_user_id on location_events  (cost=0.00..3650.32 rows=753 width=80)
+         Index Cond: (user_id = 4213)
+         Filter: ((date_created >= '2012-09-25 07:00:00'::timestamp without time zone) AND (date_created < '2012-10-03 07:00:00'::timestamp without time zone))
+(4 rows)
+
+
+
+On Oct 1, 2012, at 11:55 PM, Dave Tapley wrote:
+
+> The good news is that I've found a much better query for lastLocation.
+>
+> All you need to do is add :order => 'date_created ASC' to the arguments to last.
+>
+> It seems weird that adding more ordering drastically improves it, if we look at the SQL:
+>
+> SELECT "location_events".* FROM "location_events" WHERE (user_id='4249' and date_created>='2012-09-17' and date_created<='2012-09-23') ORDER BY date_created ASC LIMIT 1
+> And explain it:
+>
+>  Limit  (cost=1568.63..1568.63 rows=1 width=80)
+>    ->  Sort  (cost=1568.63..1569.17 rows=215 width=80)
+>          Sort Key: date_created
+>          ->  Index Scan using index_location_events_on_user_id on location_events  (cost=0.00..1567.56 rows=215 width=80)
+>                Index Cond: (user_id = 4249)
+>                Filter: ((date_created >= '2012-09-17 00:00:00'::timestamp without time zone) AND (date_created <= '2012-09-23 00:00:00'::timestamp without time zone))
+> Postgres now concedes that it's better to do the index scan on user id first, and then do a sort on the 215 rows within that date range (for that user).
+>
+> I should note that you can also flip .last with .first, and ASC for DESC in the definition of lastLocation, so you get:
+>
+>  LocationEvent.first(:conditions => ["user_id=? and date_created>=? and date_created<=?",@user.id.to_s,dateBeg,dateEnd], :order => 'date_created DESC')
+> And it's conceptually the same query.
+>
+> Finally, there is a (very, very) subtle bug in the definition of firstLocation (the 'bad thing' I mentioned in the above comment), which can be fixed in the same way. It seems that when Rails turns .first in to LIMIT 1 with no ORDER BY we always get out the matching location event with the highest ID. I don't believe that's guaranteed (I'll check up), but if it's not we might be safer throwing a :order => 'date_created ASC' in to the .first as well. It is slightly slower than the current code, but not by much.
+>
+> Hopefully you've managed to follow me, the realization at the end is that this is what we should have written to start with:
+>
+> firstLocation = LocationEvent.first(:conditions => ["user_id=? and date_created>=? and date_created<=?",@user.id.to_s,dateBeg,dateEnd], :order => 'date_created ASC')
+> lastLocation = LocationEvent.first(:conditions => ["user_id=? and date_created>=? and date_created<=?",@user.id.to_s,dateBeg,dateEnd], :order => 'date_created DESC')
+> —
+> Reply to this email directly or view it on GitHub.
+>
+>
