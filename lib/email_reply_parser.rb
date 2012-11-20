@@ -30,7 +30,7 @@ require 'strscan'
 #
 # [mail]: https://github.com/mikel/mail
 class EmailReplyParser
-  VERSION = "0.5.0"
+  VERSION = "0.5.3"
 
   # Public: Splits an email body into a list of Fragments.
   #
@@ -78,13 +78,20 @@ class EmailReplyParser
     # from_address - from address of the email (optional)
     #
     # Returns this same Email instance.
+    
     def read(text, from_address = "")
       # parse out the from name if one exists and save for use later
       @from_name = parse_name_from_address(from_address)
-      
+     
+      # in 1.9 we want to operate on the raw bytes
+      text = text.dup.force_encoding('binary') if text.respond_to?(:force_encoding)
+
+      # Normalize line endings.
+      text.gsub!("\r\n", "\n")
+
       # Check for multi-line reply headers. Some clients break up
       # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
-      if match = text.match(/^(On (.+)wrote:)$/m)
+      if match = text.match(/^(On\s(.+)wrote:)$/m)
         # Remove all new lines from the reply header. as long as we don't have any double newline
         # if we do they we have grabbed something that is not actually a reply header
         text.gsub! match[1], match[1].gsub("\n", " ") unless match[1] =~ /\n\n/
@@ -105,7 +112,7 @@ class EmailReplyParser
 
       # Use the StringScanner to pull out each line of the email content.
       @scanner = StringScanner.new(text)
-      while line = @scanner.scan_until(/\n/)
+      while line = @scanner.scan_until(/\n/n)
         scan_line(line)
       end
 
@@ -158,7 +165,7 @@ class EmailReplyParser
 
       # We're looking for leading `>`'s to see if this line is part of a
       # quoted Fragment.
-      is_quoted = !!(line =~ /(>+)$/)
+      is_quoted = !!(line =~ /(>+)$/n)
 
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
@@ -191,7 +198,7 @@ class EmailReplyParser
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-      line =~ /^:etorw.*nO$/
+      line =~ /^:etorw.*nO$/n
     end
 
     # Detects if a given line is the beginning of a signature
