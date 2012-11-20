@@ -149,11 +149,34 @@ class EmailReplyParser
     #
     # Returns a String.
     def parse_name_from_address(email)
-      match = email.match(/^["']*([\w\s]+)["']*\s*</)
+      match = email.match(/^["']*([\w\s,]+)["']*\s*</)
       unless match.nil?
-        match[1].strip.to_s
+        normalize_name(match[1].strip.to_s)
       else
         ""
+      end
+    end
+
+    # Normalize a name to First Last
+    #
+    # name - name to normailze.
+    #
+    # Returns a String.
+
+    def normalize_name(name)
+      if name.include?(',')
+        make_name_first_then_last(name)
+       else
+        name
+      end
+    end
+
+    def make_name_first_then_last(name)
+      split_name = name.split(',')
+      if split_name[0].include?(" ")
+        split_name[0].to_s
+      else
+        split_name[1].strip + " " + split_name[0].strip
       end
     end
 

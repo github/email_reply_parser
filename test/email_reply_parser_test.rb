@@ -161,6 +161,13 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal expected_body, EmailReplyParser.parse_reply(body, "Jim Smith <john.smith@gmail.com>")
   end
 
+def test_parse_out_signature_using_from_name_last_then_first
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_no_signature_deliminator.txt").to_s
+    expected_body = "I don't like putting any delimiator in my signature because I think that is cool.\n\nReally it is."
+    assert_equal expected_body, EmailReplyParser.parse_reply(body, '"Smith, Jim" <john.smith@gmail.com>')
+  end
+
+
   def test_that_a_sentence_with_my_name_in_it_does_not_become_a_signature
     body = IO.read EMAIL_FIXTURE_PATH.join("email_mentions_own_name.txt").to_s
     expected_body = "Hi,\n\nMy name is Jim Smith and I had a question.\n\nWhat do you do?"
@@ -218,6 +225,25 @@ This line would have been considered part of the header line."
     assert_match /One outstanding question/, reply.fragments[0].to_s
     assert_match /^On Oct 1, 2012/, reply.fragments[1].to_s
   end
+
+  def test_normalize_name_first_last
+    email = EmailReplyParser::Email.new
+    name = "John Smith"
+    assert_equal name, email.send(:normalize_name, name)
+  end
+
+  def test_normalize_name_last_first
+    email = EmailReplyParser::Email.new
+    name = "Smith, John"
+    assert_equal "John Smith", email.send(:normalize_name, name)
+  end
+ 
+  def test_normalize_name_first_last_and_qualification
+    email = EmailReplyParser::Email.new
+    name = "John Smith, MD"
+    assert_equal "John Smith", email.send(:normalize_name, name)
+  end
+
 
   def email(name)
     body = IO.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
