@@ -249,9 +249,16 @@ class EmailReplyParser
     # Returns true if @from_name is a big part of the line, or false.
 
     def line_is_signature_name?(line)
-      @from_name != "" && (line =~ /#{@from_name.reverse}/) && ((@from_name.size.to_f / line.size) > 0.25)
+      regexp = generate_regexp_for_name()
+      @from_name != "" && (line =~ regexp) && ((@from_name.size.to_f / line.size) > 0.25)
     end
 
+    #generates regexp which always for additional words or initials between first and last names 
+    def generate_regexp_for_name
+      name_parts = @from_name.reverse.split(" ")
+      seperator = '[\w.\s]*'
+      regexp = Regexp.new(name_parts.join(seperator))
+    end
     # Builds the fragment string and reverses it, after all lines have been
     # added.  It also checks to see if this Fragment is hidden.  The hidden
     # Fragment check reads from the bottom to the top.
