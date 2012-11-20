@@ -79,7 +79,7 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
 
   def test_reads_email_with_correct_signature
     reply = email :correct_sig
-    
+
     assert_equal 2, reply.fragments.size
     assert_equal [false, false], reply.fragments.map { |f| f.quoted? }
     assert_equal [false, true], reply.fragments.map { |f| f.signature? }
@@ -93,6 +93,14 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match /^I get/,   reply.fragments[0].to_s
     assert_match /^On/,      reply.fragments[1].to_s
     assert_match /Was this/, reply.fragments[1].to_s
+  end
+
+  def test_deals_with_windows_line_endings
+    reply = email :email_1_7
+
+    assert_match /:\+1:/,     reply.fragments[0].to_s
+    assert_match /^On/,       reply.fragments[1].to_s
+    assert_match /Steps 0-2/, reply.fragments[1].to_s
   end
 
   def test_does_not_modify_input_string
@@ -133,9 +141,9 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
 
   def test_retains_bullets
     body = IO.read EMAIL_FIXTURE_PATH.join("email_bullets.txt").to_s
-    assert_equal "test 2 this should list second\n\nand have spaces\n\nand retain this formatting\n\n\n   - how about bullets\n   - and another", 
+    assert_equal "test 2 this should list second\n\nand have spaces\n\nand retain this formatting\n\n\n   - how about bullets\n   - and another",
       EmailReplyParser.parse_reply(body)
-      end
+  end
 
   def test_parse_reply
     body = IO.read EMAIL_FIXTURE_PATH.join("email_1_2.txt").to_s
@@ -198,6 +206,12 @@ This line would have been considered part of the header line."
     address = "<bob@gmail.com>"
     email = EmailReplyParser::Email.new
     assert_equal "", email.send(:parse_name_from_address, address)
+  end
+
+  def test_one_is_not_on
+    reply = email("email_one_is_not_on")
+    assert_match /One outstanding question/, reply.fragments[0].to_s
+    assert_match /^On Oct 1, 2012/, reply.fragments[1].to_s
   end
 
   def email(name)
