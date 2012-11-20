@@ -257,7 +257,7 @@ class EmailReplyParser
     def generate_regexp_for_name
       name_parts = @from_name.reverse.split(" ")
       seperator = '[\w.\s]*'
-      regexp = Regexp.new(name_parts.join(seperator))
+      regexp = Regexp.new(name_parts.join(seperator), Regexp::IGNORECASE)
     end
     # Builds the fragment string and reverses it, after all lines have been
     # added.  It also checks to see if this Fragment is hidden.  The hidden

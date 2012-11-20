@@ -161,6 +161,13 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal expected_body, EmailReplyParser.parse_reply(body, "Jim Smith <john.smith@gmail.com>")
   end
 
+ def test_parse_out_signature_using_from_name_different_case
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_no_signature_deliminator.txt").to_s
+    expected_body = "I don't like putting any delimiator in my signature because I think that is cool.\n\nReally it is."
+    assert_equal expected_body, EmailReplyParser.parse_reply(body, "jim smith <john.smith@gmail.com>")
+  end
+
+
   def test_parse_out_signature_using_from_name_last_then_first
     body = IO.read EMAIL_FIXTURE_PATH.join("email_no_signature_deliminator.txt").to_s
     expected_body = "I don't like putting any delimiator in my signature because I think that is cool.\n\nReally it is."
