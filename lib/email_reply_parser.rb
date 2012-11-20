@@ -83,25 +83,7 @@ class EmailReplyParser
       # parse out the from name if one exists and save for use later
       @from_name = parse_name_from_address(from_address)
      
-      # in 1.9 we want to operate on the raw bytes
-      text = text.dup.force_encoding('binary') if text.respond_to?(:force_encoding)
-
-      # Normalize line endings.
-      text.gsub!("\r\n", "\n")
-
-      # Check for multi-line reply headers. Some clients break up
-      # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
-      if match = text.match(/^(On\s(.+)wrote:)$/m)
-        # Remove all new lines from the reply header. as long as we don't have any double newline
-        # if we do they we have grabbed something that is not actually a reply header
-        text.gsub! match[1], match[1].gsub("\n", " ") unless match[1] =~ /\n\n/
-      end
-
-      # Some users may reply directly above a line of underscores.
-      # In order to ensure that these fragments are split correctly,
-      # make sure that all lines of underscores are preceded by
-      # at least two newline characters.
-      text.gsub!(/([^\n])(?=\n_{7}_+)$/m, "\\1\n")
+      text = normalize_text(text)
 
       # The text is reversed initially due to the way we check for hidden
       # fragments.
@@ -141,7 +123,35 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-   
+  
+    # normalize text so it is easier to parse
+    #
+    # text - text to normalize
+    #
+    # Returns a String
+    #
+    def normalize_text(text)
+      # in 1.9 we want to operate on the raw bytes
+      text = text.dup.force_encoding('binary') if text.respond_to?(:force_encoding)
+
+      # Normalize line endings.
+      text.gsub!("\r\n", "\n")
+
+      # Check for multi-line reply headers. Some clients break up
+      # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
+      if match = text.match(/^(On\s(.+)wrote:)$/m)
+        # Remove all new lines from the reply header. as long as we don't have any double newline
+        # if we do they we have grabbed something that is not actually a reply header
+        text.gsub! match[1], match[1].gsub("\n", " ") unless match[1] =~ /\n\n/
+      end
+
+      # Some users may reply directly above a line of underscores.
+      # In order to ensure that these fragments are split correctly,
+      # make sure that all lines of underscores are preceded by
+      # at least two newline characters.
+      text.gsub!(/([^\n])(?=\n_{7}_+)$/m, "\\1\n")
+      text
+    end
 
     # Parse a person's name from an e-mail address
     #
