@@ -237,7 +237,8 @@ class EmailReplyParser
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-      line =~ /^:etorw.*nO$/n
+      regexp = Regexp.new("On wrote:".reverse.sub(" ", ".*"))
+      line =~ regexp 
     end
 
     # Detects if a given line is the beginning of a signature
