@@ -208,6 +208,18 @@ This line would have been considered part of the header line."
     assert_equal expected_body, EmailReplyParser.parse_reply(body) 
   end
 
+  def test_from_address_in_quote_header
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_from_address_in_quote_header.txt").to_s
+    expected_body = "I have gained valuable experience from working with students from other cultures. They bring a significantly different perspective to the work we do. I have also had the opportunity to practice making myself very clear in discussion, so that everyone understands. I've also seen how different our culture is to them, in their reactions to what I think is a normal approach to assignments, and to life in general."
+    assert_equal expected_body, EmailReplyParser.parse_reply(body, "shelly@example.com") 
+  end
+
+  def test_do_not_make_any_line_with_from_address_quote_heading
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_mentions_own_email_address.txt").to_s
+    expected_body = "Hi,\n\nMy email is john.smith@gmail.com and I had a question.\n\nWhat do you do?"
+    assert_equal expected_body, EmailReplyParser.parse_reply(body, "Jim Smith <john.smith@gmail.com>")
+  end
+
   def test_parsing_name_from_address
     address = "Bob Jones <bob@gmail.com>"
     email = EmailReplyParser::Email.new
@@ -227,9 +239,21 @@ This line would have been considered part of the header line."
   end
 
   def test_parsing_name_from_address_with_no_name
-    address = "<bob@gmail.com>"
+    address = "bob@gmail.com"
     email = EmailReplyParser::Email.new
     assert_equal "", email.send(:parse_name_from_address, address)
+  end
+
+  def test_parsing_email_from_address_with_name
+    address = "\"Bob Jones\" <bob@gmail.com>"
+    email = EmailReplyParser::Email.new
+    assert_equal "bob@gmail.com", email.send(:parse_email_from_address, address)
+  end
+
+  def test_parsing_email_from_address_without_name
+    address = "bob@gmail.com"
+    email = EmailReplyParser::Email.new
+    assert_equal "bob@gmail.com", email.send(:parse_email_from_address, address)
   end
 
   def test_one_is_not_on

@@ -82,7 +82,8 @@ class EmailReplyParser
     def read(text, from_address = "")
       # parse out the from name if one exists and save for use later
       @from_name = parse_name_from_address(from_address)
-     
+      @from_email = parse_email_from_address(from_address)
+
       text = normalize_text(text)
 
       # The text is reversed initially due to the way we check for hidden
@@ -158,12 +159,21 @@ class EmailReplyParser
     # email - email address.
     #
     # Returns a String.
-    def parse_name_from_address(email)
-      match = email.match(/^["']*([\w\s,]+)["']*\s*</)
+    def parse_name_from_address(address)
+      match = address.match(/^["']*([\w\s,]+)["']*\s*</)
       unless match.nil?
         normalize_name(match[1].strip.to_s)
       else
         ""
+      end
+    end
+
+    def parse_email_from_address(address)
+      match = address.match /<(.*)>/
+      if match.nil?
+        address
+      else
+        match[1]
       end
     end
 
@@ -209,8 +219,17 @@ class EmailReplyParser
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
       if @fragment && line == EMPTY
-        if signature_line?(@fragment.lines.last)
-          @fragment.signature = true
+        last_line = @fragment.lines.last
+        is_signature = signature_line?(last_line) 
+        is_quote_header = quote_header?(last_line)
+
+        if is_signature || is_quote_header
+          if is_signature
+            @fragment.signature = true
+          else 
+            @fragment.quoted = true
+          end
+
           finish_fragment
         end
       end
@@ -230,14 +249,15 @@ class EmailReplyParser
       end
     end
 
-    # Detects if a given line is a header above a quoted area.  It is only
-    # checked for lines preceding quoted regions.
+    # Detects if a given line is a header above a quoted area.
     #
     # line - A String line of text from the email.
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-      regexp = Regexp.new("On wrote:".reverse.sub(" ", ".*"))
+      standard_header_regexp_string = "On wrote:^".reverse.sub(" ", ".*") #using ^ instead of $ because the lines it checks gets reversed
+      from_address_regexp_string = "To: #{@from_email}".reverse
+      regexp = /(#{standard_header_regexp_string})|(#{from_address_regexp_string})/i
       line =~ regexp 
     end
 
