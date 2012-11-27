@@ -227,15 +227,14 @@ class EmailReplyParser
       if @fragment && line == EMPTY
         last_line = @fragment.lines.last
         is_signature = signature_line?(last_line) 
-        is_quote_header = quote_header?(last_line)
+        is_multiline_quote_header = multiline_quote_header_in_fragment?(@fragment)
 
-        if is_signature || is_quote_header
+        if is_signature || is_multiline_quote_header
           if is_signature
             @fragment.signature = true
           else 
             @fragment.quoted = true
           end
-
           finish_fragment
         end
       end
@@ -261,12 +260,24 @@ class EmailReplyParser
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-      standard_header_regexp_string = "On wrote:^".reverse.sub(" ", ".*") #using ^ instead of $ because the lines it checks gets reversed
-      from_email_regexp_string = "To: #{@from_email}".reverse
-      from_name_raw_regexp_string = "To: #{@from_name_raw}".reverse
+      standard_header_regexp = reverse_regexp("On.*wrote:$")
+      line =~ standard_header_regexp
+    end
+
+    def multiline_quote_header_in_fragment?(fragment)
+      fragment_text = @fragment.lines.join("\n")
+      quoted_regex = "Date:.*\nFrom:.*\nTo:.*\nSubject:.*"
+      fragment_text =~ reverse_regexp(quoted_regex)
+    end
+
+    def reverse_regexp(regexp, ignore_case = true)
+      regexp_text = regexp.to_s
+      regexp_text.gsub!(".*", "*.")
+      regexp_text.gsub!("$", "^")
       
-      regexp = /(#{standard_header_regexp_string})|(#{from_email_regexp_string})|(#{from_name_raw_regexp_string})/i
-      line =~ regexp 
+      regexp_options = []
+      regexp_options << Regexp::IGNORECASE if ignore_case
+      Regexp.new(regexp_text.reverse, *regexp_options)
     end
 
     # Detects if a given line is the beginning of a signature
