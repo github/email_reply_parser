@@ -81,7 +81,8 @@ class EmailReplyParser
     
     def read(text, from_address = "")
       # parse out the from name if one exists and save for use later
-      @from_name = parse_name_from_address(from_address)
+      @from_name_raw = parse_raw_name_from_address(from_address)
+      @from_name_normalized = normalize_name(@from_name_raw)
       @from_email = parse_email_from_address(from_address)
 
       text = normalize_text(text)
@@ -160,9 +161,14 @@ class EmailReplyParser
     #
     # Returns a String.
     def parse_name_from_address(address)
+      raw_name = parse_raw_name_from_address(address)
+      normalize_name(raw_name)
+    end
+
+    def parse_raw_name_from_address(address)
       match = address.match(/^["']*([\w\s,]+)["']*\s*</)
       unless match.nil?
-        normalize_name(match[1].strip.to_s)
+        match[1].strip.to_s
       else
         ""
       end
@@ -256,8 +262,10 @@ class EmailReplyParser
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
       standard_header_regexp_string = "On wrote:^".reverse.sub(" ", ".*") #using ^ instead of $ because the lines it checks gets reversed
-      from_address_regexp_string = "To: #{@from_email}".reverse
-      regexp = /(#{standard_header_regexp_string})|(#{from_address_regexp_string})/i
+      from_email_regexp_string = "To: #{@from_email}".reverse
+      from_name_raw_regexp_string = "To: #{@from_name_raw}".reverse
+      
+      regexp = /(#{standard_header_regexp_string})|(#{from_email_regexp_string})|(#{from_name_raw_regexp_string})/i
       line =~ regexp 
     end
 
@@ -281,12 +289,12 @@ class EmailReplyParser
 
     def line_is_signature_name?(line)
       regexp = generate_regexp_for_name()
-      @from_name != "" && (line =~ regexp) && ((@from_name.size.to_f / line.size) > 0.25)
+      @from_name_normalized != "" && (line =~ regexp) && ((@from_name_normalized.size.to_f / line.size) > 0.25)
     end
 
     #generates regexp which always for additional words or initials between first and last names 
     def generate_regexp_for_name
-      name_parts = @from_name.reverse.split(" ")
+      name_parts = @from_name_normalized.reverse.split(" ")
       seperator = '[\w.\s]*'
       regexp = Regexp.new(name_parts.join(seperator), Regexp::IGNORECASE)
     end
