@@ -1,0 +1,10 @@
+Outlook with a reply directly above line
+________________________________________
+From: CRM Comments [crm-comment@example.com]
+Sent: Friday, 23 March 2012 5:08 p.m.
+To: John S. Greene
+Subject: [contact:106] John Greene
+
+A new comment has been added to the Contact named 'John Greene':
+
+I am replying to a comment.

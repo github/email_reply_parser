@@ -1,0 +1,12 @@
+This emails tests that multiline header fix isn't catching things it shouldn't.
+
+On friday when I tried it didn't work as expect.
+
+This line would have been considered part of the header line.
+
+On Wed, Apr 4, 2012 at 9:32 AM, Bob Jones <bjones@gmail.com> wrote:
+> We are still very interested in achievements you’ve had from participating
+> in our initiative.  When you have a chance, please reply to this
+> email and describe what you have done.
+>
+
