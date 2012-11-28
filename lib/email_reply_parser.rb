@@ -260,7 +260,7 @@ class EmailReplyParser
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-      standard_header_regexp = reverse_regexp("On.*wrote:$")
+      standard_header_regexp = reverse_regexp("On\s.+wrote:$")
       line =~ standard_header_regexp
     end
 
@@ -315,6 +315,7 @@ class EmailReplyParser
     def reverse_regexp(regexp, ignore_case = true)
       regexp_text = regexp.to_s.reverse
       regexp_text.gsub!("*.", ".*")
+      regexp_text.gsub!("+.", ".+")
       regexp_text.gsub!("$", "^")
       regexp_text = reverse_parentheses(regexp_text)
 
