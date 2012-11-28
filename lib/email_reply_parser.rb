@@ -266,9 +266,11 @@ class EmailReplyParser
 
     def multiline_quote_header_in_fragment?(fragment)
       fragment_text = @fragment.lines.join("\n")
-      quoted_header_regexV1 = "Date:.*\nFrom:.*\nTo:.*\nSubject:.*"
-      quoted_header_regexV2 = "From:.*\nSent:.*\nTo:.*\nSubject:.*"
-      quoted_regex = "(#{quoted_header_regexV1}|#{quoted_header_regexV2})"
+      quoted_header_regexps = []
+      quoted_header_regexps <<  "(Date|Sent):.*\nFrom:.*\nTo:.*\nSubject:.*"
+      quoted_header_regexps << "From:.*\n(Date|Sent):.*\nTo:.*\nSubject:.*"
+      quoted_header_regexps << "From:.*\nTo:.*\n(Date|Sent):.*\nSubject:.*"
+      quoted_regex = "(#{quoted_header_regexps.join("|")})"
       fragment_text =~ reverse_regexp(quoted_regex)
     end
 
@@ -276,11 +278,17 @@ class EmailReplyParser
       regexp_text = regexp.to_s.reverse
       regexp_text.gsub!("*.", ".*")
       regexp_text.gsub!("$", "^")
-      regexp_text.gsub!(/\)(.*)\(/m, "(\\1)")  #reverses parathesis
-      
+      regexp_text = reverse_parentheses(regexp_text)
+
       regexp_options = []
       regexp_options << Regexp::IGNORECASE if ignore_case
       Regexp.new(regexp_text, *regexp_options)
+    end
+
+    def reverse_parentheses(text)
+      text.gsub!(/\)(.*)\(/m, '(\1)')  #reverses outter parentheses
+      text.gsub!(/\)(.*?)\(/m, '(\1)')  #reverses nested parentheses
+      text
     end
 
     # Detects if a given line is the beginning of a signature
