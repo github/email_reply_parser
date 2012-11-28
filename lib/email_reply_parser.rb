@@ -264,17 +264,53 @@ class EmailReplyParser
       line =~ standard_header_regexp
     end
 
+    # Detects if a fragment has a multiline quote header
+    #
+    # fragment - fragment to look in
+    #
+    # Returns true if the fragment has header, or false.
+
     def multiline_quote_header_in_fragment?(fragment)
       fragment_text = @fragment.lines.join("\n")
+      
+      from_labels = ["From", "De"]
+      to_labels = ["To", "Para"]
+      date_labels = ["Date", "Sent", "Enviada em"]
+      subject_labels = ["Subject", "Assunto"]
+      reply_to_labels = ["Reply-To"]
+
+      from = create_regexp_for_labels(from_labels)
+      to = create_regexp_for_labels(to_labels)
+      date = create_regexp_for_labels(date_labels)
+      subject = create_regexp_for_labels(subject_labels)
+      reply_to = create_regexp_for_labels(reply_to_labels)
+
       quoted_header_regexps = []
-      quoted_header_regexps <<  "(Date|Sent):.*\nFrom:.*\nTo:.*\nSubject:.*"
-      quoted_header_regexps << "From:.*\n(Date|Sent):.*\nTo:.*\nSubject:.*"
-      quoted_header_regexps << "From:.*\nTo:.*\n(Date|Sent):.*\nSubject:.*"
-      quoted_header_regexps << "From:.*\nReply-To:.*\n(Date|Sent):.*\nTo:.*\nSubject:.*"
+      quoted_header_regexps <<  "#{date}:.*\n#{from}:.*\n#{to}:.*\n#{subject}:.*"
+      quoted_header_regexps << "#{from}:.*\n#{date}:.*\n#{to}:.*\n#{subject}:.*"
+      quoted_header_regexps << "#{from}:.*\n#{to}:.*\n#{date}:.*\n#{subject}:.*"
+      quoted_header_regexps << "#{from}:.*\n#{reply_to}:.*\n#{date}:.*\n#{to}:.*\n#{subject}:.*"
       
       quoted_regex = "(#{quoted_header_regexps.join("|")})"
       fragment_text =~ reverse_regexp(quoted_regex)
     end
+
+    # create regexp that will search for any from a list of labels
+    #
+    # labels - Array of text strings
+    #
+    # Returns regexp string
+
+    def create_regexp_for_labels(labels)
+      "(#{labels.join("|")})"
+    end
+
+    # reverses a regular expression 
+    #
+    # regexp - String or Regexp that you want to reverse
+    # ignore_case - where to the returned Regexp should be case insensitive
+    #
+    # Returns Regexp
 
     def reverse_regexp(regexp, ignore_case = true)
       regexp_text = regexp.to_s.reverse
@@ -286,6 +322,12 @@ class EmailReplyParser
       regexp_options << Regexp::IGNORECASE if ignore_case
       Regexp.new(regexp_text, *regexp_options)
     end
+
+    # reverses parentheses in a string 
+    #
+    # text - String or Regexp that you want to reverse
+    #
+    # Returns String
 
     def reverse_parentheses(text)
       text.gsub!(/\)(.*)\(/m, '(\1)')  #reverses outter parentheses

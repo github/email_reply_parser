@@ -244,6 +244,11 @@ def test_multiline_quote_header_from_to_date_subject
     assert_equal expected_body, EmailReplyParser.parse_reply(body, "Smith, Shelly <shelly@example.com>") 
   end
 
+def test_multiline_quote_header_pt_br
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_multiline_quote_header_pt_br.txt").to_s
+    expected_body = "I have gained valuable experience from working with students from other cultures. They bring a significantly different perspective to the work we do. I have also had the opportunity to practice making myself very clear in discussion, so that everyone understands. I've also seen how different our culture is to them, in their reactions to what I think is a normal approach to assignments, and to life in general."
+    assert_equal expected_body, EmailReplyParser.parse_reply(body, "Smith, Shelly <shelly@example.com>") 
+  end
 
 
   def test_parsing_name_from_address
