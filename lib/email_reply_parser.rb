@@ -270,6 +270,8 @@ class EmailReplyParser
       quoted_header_regexps <<  "(Date|Sent):.*\nFrom:.*\nTo:.*\nSubject:.*"
       quoted_header_regexps << "From:.*\n(Date|Sent):.*\nTo:.*\nSubject:.*"
       quoted_header_regexps << "From:.*\nTo:.*\n(Date|Sent):.*\nSubject:.*"
+      quoted_header_regexps << "From:.*\nReply-To:.*\n(Date|Sent):.*\nTo:.*\nSubject:.*"
+      
       quoted_regex = "(#{quoted_header_regexps.join("|")})"
       fragment_text =~ reverse_regexp(quoted_regex)
     end
