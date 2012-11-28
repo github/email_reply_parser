@@ -279,20 +279,32 @@ class EmailReplyParser
       subject_labels = ["Subject", "Assunto"]
       reply_to_labels = ["Reply-To"]
 
-      from = create_regexp_for_labels(from_labels)
-      to = create_regexp_for_labels(to_labels)
-      date = create_regexp_for_labels(date_labels)
-      subject = create_regexp_for_labels(subject_labels)
-      reply_to = create_regexp_for_labels(reply_to_labels)
+      quoted_header_regexp = 
+        multiline_quoted_header_regexps(
+          :from => create_regexp_for_labels(from_labels),
+          :to => create_regexp_for_labels(to_labels),
+          :date => create_regexp_for_labels(date_labels),
+          :subject => create_regexp_for_labels(subject_labels),
+          :reply_to => create_regexp_for_labels(reply_to_labels)
+        )
+           
+      fragment_text =~ quoted_header_regexp
+    end
 
+    # create regexp for multiline quote headers 
+    #
+    # labels - hash of labels
+    #
+    # Returns Regexp
+    def multiline_quoted_header_regexps(labels)
       quoted_header_regexps = []
-      quoted_header_regexps <<  "#{date}:.*\n#{from}:.*\n#{to}:.*\n#{subject}:.*"
-      quoted_header_regexps << "#{from}:.*\n#{date}:.*\n#{to}:.*\n#{subject}:.*"
-      quoted_header_regexps << "#{from}:.*\n#{to}:.*\n#{date}:.*\n#{subject}:.*"
-      quoted_header_regexps << "#{from}:.*\n#{reply_to}:.*\n#{date}:.*\n#{to}:.*\n#{subject}:.*"
       
-      quoted_regex = "(#{quoted_header_regexps.join("|")})"
-      fragment_text =~ reverse_regexp(quoted_regex)
+      quoted_header_regexps <<  "#{labels[:date]}:.*\n#{labels[:from]}:.*\n#{labels[:to]}:.*\n#{labels[:subject]}:.*"
+      quoted_header_regexps << "#{labels[:from]}:.*\n#{labels[:date]}:.*\n#{labels[:to]}:.*\n#{labels[:subject]}:.*"
+      quoted_header_regexps << "#{labels[:from]}:.*\n#{labels[:to]}:.*\n#{labels[:date]}:.*\n#{labels[:subject]}:.*"
+      quoted_header_regexps << "#{labels[:from]}:.*\n#{labels[:reply_to]}:.*\n#{labels[:date]}:.*\n#{labels[:to]}:.*\n#{labels[:subject]}:.*"
+
+      reverse_regexp("(#{quoted_header_regexps.join("|")})")
     end
 
     # create regexp that will search for any from a list of labels
