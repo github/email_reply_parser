@@ -11,6 +11,12 @@ See more at the [Rocco docs][rocco].
 
 [rocco]: http://help.github.com/code/email_reply_parser/
 
+##Usage
+
+To parse reply body:
+
+`parsed_body = EmailReplyParser.parse_reply(email_body)`
+
 ## Problem?
 
 If you have a question about the behavior and formatting of email replies on GitHub, check out [support][support].  If you have a specific issue regarding this library, then hit up the [Issues][issues].
@@ -86,18 +92,3 @@ Not everyone follows this convention:
     * Note: blah blah blah                                            *
     **********************DISCLAIMER***********************************
 
-
-
-### Strange Quoting
-
-Apparently, prefixing lines with `>` isn't universal either:
-
-    Hello
-
-    --
-    Rick
-
-    ________________________________________
-    From: Bob [reply@reply.github.com]
-    Sent: Monday, March 14, 2011 6:16 PM
-    To: Rick
