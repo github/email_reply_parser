@@ -75,11 +75,13 @@ Gem::Specification.new do |s|
     test/emails/email_1_4.txt
     test/emails/email_1_5.txt
     test/emails/email_1_6.txt
+    test/emails/email_1_7.txt
     test/emails/email_2_1.txt
     test/emails/email_BlackBerry.txt
     test/emails/email_bullets.txt
     test/emails/email_iPhone.txt
     test/emails/email_multi_word_sent_from_my_mobile_device.txt
+    test/emails/email_one_is_not_on.txt
     test/emails/email_sent_from_my_not_signature.txt
   ]
   # = MANIFEST =

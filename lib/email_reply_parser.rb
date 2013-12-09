@@ -30,7 +30,7 @@ require 'strscan'
 #
 # [mail]: https://github.com/mikel/mail
 class EmailReplyParser
-  VERSION = "0.5.3"
+  VERSION = "0.5.4"
 
   # Public: Splits an email body into a list of Fragments.
   #
@@ -262,4 +262,3 @@ class EmailReplyParser
     end
   end
 end
-
