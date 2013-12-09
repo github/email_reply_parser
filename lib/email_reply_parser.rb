@@ -127,7 +127,14 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-    SIG_REGEX = /(--|__|\w-$)|(^(\w+\s*){1,3} #{"Sent from my".reverse}$)/n
+    SIGNATURE = '(?m)(--|__|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)'
+
+    begin
+      require 're2'
+      SIG_REGEX = RE2::Regexp.new(SIGNATURE)
+    rescue LoadError
+      SIG_REGEX = Regexp.new(SIGNATURE)
+    end
 
     ### Line-by-Line Parsing
 
@@ -139,7 +146,7 @@ class EmailReplyParser
     # Returns nothing.
     def scan_line(line)
       line.chomp!("\n")
-      line.lstrip! unless line =~ SIG_REGEX
+      line.lstrip! unless SIG_REGEX.match(line) 
 
       # We're looking for leading `>`'s to see if this line is part of a
       # quoted Fragment.
@@ -148,7 +155,7 @@ class EmailReplyParser
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
       if @fragment && line == EMPTY
-        if @fragment.lines.last =~ SIG_REGEX
+        if SIG_REGEX.match @fragment.lines.last
           @fragment.signature = true
           finish_fragment
         end
