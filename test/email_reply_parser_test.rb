@@ -156,6 +156,12 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match /^On Oct 1, 2012/, reply.fragments[1].to_s
   end
 
+  def test_pathological_emails
+    t0 = Time.now
+    reply = email("pathological")
+    assert (Time.now - t0) < 1
+  end
+
   def email(name)
     body = IO.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
     EmailReplyParser.read body
