@@ -83,6 +83,7 @@ Gem::Specification.new do |s|
     test/emails/email_multi_word_sent_from_my_mobile_device.txt
     test/emails/email_one_is_not_on.txt
     test/emails/email_sent_from_my_not_signature.txt
+    test/emails/pathological.txt
   ]
   # = MANIFEST =
 
