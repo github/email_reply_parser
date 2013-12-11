@@ -159,7 +159,7 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
   def test_pathological_emails
     t0 = Time.now
     reply = email("pathological")
-    assert (Time.now - t0) < 1
+    assert (Time.now - t0) < 1, "Took too long, upgrade to re2 gem."
   end
 
   def email(name)
