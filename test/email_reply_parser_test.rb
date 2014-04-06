@@ -167,11 +167,6 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert (Time.now - t0) < 1, "Took too long, upgrade to re2 gem."
   end
 
-  def test_doesnt_remove_signature_delimiter_in_mid_line
-    reply = email(:email_sig_delimiter_in_middle_of_line)
-    assert_equal 1, reply.fragments.size
-  end
-
   def email(name)
     body = IO.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
     EmailReplyParser.read body
