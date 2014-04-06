@@ -133,7 +133,7 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-    SIGNATURE = '(?m)(--|__|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)'
+    SIGNATURE = '(?m)^(--|__|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)'
 
     begin
       require 're2'
