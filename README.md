@@ -65,7 +65,7 @@ multiple lines.  GMail breaks up any lines over 80 characters for you.
     wrote:
     > blah
 
-Not to mention that we're search for "on" and "wrote".  It won't work
+Not to mention that we're searching for "on" and "wrote".  It won't work
 with other languages.
 
 Possible solution: Remove "reply@reply.github.com" lines...
