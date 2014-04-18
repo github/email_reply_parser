@@ -11,11 +11,15 @@ See more at the [Rocco docs][rocco].
 
 [rocco]: http://help.github.com/code/email_reply_parser/
 
-##Usage
+## Usage
 
 To parse reply body:
 
-`parsed_body = EmailReplyParser.parse_reply(email_body)`
+`parsed_body = EmailReplyParser.parse_reply(email_body, from_address)`
+
+The from_address is optional.  If included, it will attempt to parse out
+signatures based on the name in the from address (if signature doesn't have a
+standard delimiter.)
 
 ## Problem?
 
@@ -77,7 +81,7 @@ signatures:
 
     Hello
 
-    -- 
+    --
     Rick
 
 Not everyone follows this convention:
@@ -91,4 +95,3 @@ Not everyone follows this convention:
     **********************DISCLAIMER***********************************
     * Note: blah blah blah                                            *
     **********************DISCLAIMER***********************************
-

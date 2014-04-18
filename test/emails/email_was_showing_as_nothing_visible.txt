@@ -1,0 +1,13 @@
+On Friday, one achievement I had was learning a new technology that allows us
+to keep UI elements and events separated from the software on the
+server side, which should allow for more flexible UI code and
+decreased chances of code becoming a swarm of angry hornets.  I've
+been transparent about the initial increased development time while
+learning the technology.
+
+On Wed, Apr 4, 2012 at 9:32 AM, Bob Jones <bjones@gmail.com> wrote:
+> We are still very interested in achievements you’ve had from participating
+> in our initiative.  When you have a chance, please reply to this
+> email and describe what you have done.
+>
+
