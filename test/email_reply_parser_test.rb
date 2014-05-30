@@ -65,21 +65,22 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
 
   def test_reads_inline_replies
     reply = email(:email_1_8)
-    assert_equal 6, reply.fragments.size
+    assert_equal 7, reply.fragments.size
 
-    assert_equal [true, false, true, false, false, false],
+    assert_equal [true, false, true, false, true, false, false],
       reply.fragments.map { |f| f.quoted? }
-    assert_equal [false, false, false, false, false, true],
+    assert_equal [false, false, false, false, false, false, true],
       reply.fragments.map { |f| f.signature? }
-    assert_equal [false, false, false, false, true, true],
+    assert_equal [false, false, false, false, true, true, true],
       reply.fragments.map { |f| f.hidden? }
 
     assert_match /^On [^\:]+\:/, reply.fragments[0].to_s
     assert_match /^I will reply/, reply.fragments[1].to_s
-    assert_match /^> /, reply.fragments[2].to_s
+    assert_match "okay?", reply.fragments[2].to_s
     assert_match /^and under this./, reply.fragments[3].to_s
-    assert_match /^> /, reply.fragments[4].to_s
-    assert_match /^-/, reply.fragments[5].to_s
+    assert_match /inline/, reply.fragments[4].to_s
+    assert_equal "\n", reply.fragments[5].to_s
+    assert_equal "--\nHey there, this is my signature\n", reply.fragments[6].to_s
   end
 
   def test_recognizes_date_string_above_quote
