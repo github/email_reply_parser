@@ -52,14 +52,8 @@ The best way to get your changes merged back into core is as follows:
 
 ### Quoted Headers
 
-Quoted headers aren't picked up if there's an extra line break:
-
-    On <date>, <author> wrote:
-
-    > blah
-
-Also, they're not picked up if the email client breaks it up into
-multiple lines.  GMail breaks up any lines over 80 characters for you.
+Quoted headers aren't picked up if the email client breaks it up into multiple
+lines.  GMail breaks up any lines over 80 characters for you.
 
     On <date>, <author>
     wrote:
@@ -77,7 +71,7 @@ signatures:
 
     Hello
 
-    -- 
+    --
     Rick
 
 Not everyone follows this convention:
@@ -91,4 +85,3 @@ Not everyone follows this convention:
     **********************DISCLAIMER***********************************
     * Note: blah blah blah                                            *
     **********************DISCLAIMER***********************************
-
