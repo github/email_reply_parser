@@ -1,0 +1,16 @@
+On your remote host you can run:
+
+     telnet 127.0.0.1 52698
+
+This should connect to TextMate (on your Mac, via the tunnel). If that
+fails, the tunnel is not working.
+
+On 9 Jan 2014, at 2:47, George Plymale wrote:
+
+> I am having an odd issue wherein suddenly port forwarding stopped
+> working in a particular scenario for me.  By default I have ssh set to
+> use the following config (my ~/.ssh/config file):
+> […]
+> ---
+> Reply to this email directly or view it on GitHub:
+> https://github.com/textmate/rmate/issues/29
