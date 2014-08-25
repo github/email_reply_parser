@@ -67,6 +67,8 @@ Gem::Specification.new do |s|
     Rakefile
     email_reply_parser.gemspec
     lib/email_reply_parser.rb
+    script/release
+    script/test
     test/email_reply_parser_test.rb
     test/emails/correct_sig.txt
     test/emails/email_1_1.txt
@@ -86,6 +88,7 @@ Gem::Specification.new do |s|
     test/emails/email_one_is_not_on.txt
     test/emails/email_sent_from_my_not_signature.txt
     test/emails/email_sig_delimiter_in_middle_of_line.txt
+    test/emails/greedy_on.txt
     test/emails/pathological.txt
   ]
   # = MANIFEST =
