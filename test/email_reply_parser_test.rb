@@ -134,6 +134,11 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match /Steps 0-2/, reply.fragments[1].to_s
   end
 
+  def test_handles_non_ascii_characters
+    non_ascii_body = "Here’s a test."
+    assert_equal non_ascii_body, EmailReplyParser.parse_reply(non_ascii_body)
+  end
+
   def test_does_not_modify_input_string
     original = "The Quick Brown Fox Jumps Over The Lazy Dog"
     EmailReplyParser.read original
