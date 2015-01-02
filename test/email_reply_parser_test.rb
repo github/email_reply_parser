@@ -123,6 +123,11 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match /Steps 0-2/, reply.fragments[1].to_s
   end
 
+  def test_parse_out_just_top_for_reply_directly_above_hyphen_line
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_1_9.txt").to_s
+    assert_equal "Reply directly above hyphen line", EmailReplyParser.parse_reply(body)
+  end
+
   def test_does_not_modify_input_string
     original = "The Quick Brown Fox Jumps Over The Lazy Dog"
     EmailReplyParser.read original
@@ -139,9 +144,9 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal "Outlook with a reply", EmailReplyParser.parse_reply(body)
   end
 
-  def test_parse_out_just_top_for_outlook_with_reply_directly_above_line
+  def test_parse_out_just_top_for_outlook_with_reply_directly_above_underscore_line
     body = IO.read EMAIL_FIXTURE_PATH.join("email_2_2.txt").to_s
-    assert_equal "Outlook with a reply directly above line", EmailReplyParser.parse_reply(body)
+    assert_equal "Outlook with a reply directly above underscore line", EmailReplyParser.parse_reply(body)
   end
 
   def test_parse_out_sent_from_iPhone

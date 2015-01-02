@@ -1,4 +1,4 @@
-Outlook with a reply directly above line
+Outlook with a reply directly above underscore line
 ________________________________________
 From: CRM Comments [crm-comment@example.com]
 Sent: Friday, 23 March 2012 5:08 p.m.
