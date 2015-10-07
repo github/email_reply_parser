@@ -71,6 +71,7 @@ Gem::Specification.new do |s|
     script/test
     test/email_reply_parser_test.rb
     test/emails/correct_sig.txt
+    test/emails/only_sig.txt
     test/emails/email_1_1.txt
     test/emails/email_1_2.txt
     test/emails/email_1_3.txt
