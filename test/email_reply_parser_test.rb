@@ -107,6 +107,17 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match /^-- \nrick/, reply.fragments[1].to_s
   end
 
+  def test_reads_email_with_only_signature
+    reply = email :only_sig
+
+    assert_equal 1, reply.fragments.size
+    assert_equal [false], reply.fragments.map { |f| f.quoted? }
+    assert_equal [true], reply.fragments.map { |f| f.signature? }
+    assert_equal [true], reply.fragments.map { |f| f.hidden? }
+    assert_match /^--\n202-555-1212\n/, reply.fragments[0].to_s
+  end
+
+
   def test_deals_with_multiline_reply_headers
     reply = email :email_1_6
 
