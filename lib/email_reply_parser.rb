@@ -82,12 +82,7 @@ class EmailReplyParser
       # Normalize line endings.
       text.gsub!("\r\n", "\n")
 
-      # Check for multi-line reply headers. Some clients break up
-      # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
-      if text =~ /^(?!On.*On\s.+?wrote:)(On\s(.+?)wrote:)$/nm
-        # Remove all new lines from the reply header.
-        text.gsub! $1, $1.gsub("\n", " ")
-      end
+      text = repair_broken_reply_header(text)
 
       # Some users may reply directly above a line of underscores.
       # In order to ensure that these fragments are split correctly,
@@ -228,6 +223,27 @@ class EmailReplyParser
         @fragments << @fragment
       end
       @fragment = nil
+    end
+
+    # Stitch together multi-line reply headers. Some clients break up
+    # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
+    #
+    # If the latest reply has a line beginning with 'On', then the match
+    # will start too early and contain another match.
+    # So we repair the inner match via recursion
+    def repair_broken_reply_header(text)
+      pattern = /^(On\s(.+?)wrote:)$/nm
+      if text =~ pattern
+        match = $1
+        tail = match[1..-1]
+        if tail =~ pattern
+	      text.gsub tail, repair_broken_reply_header(tail)
+        else
+          text.gsub match, match.gsub("\n", " ")
+        end
+      else
+        text
+      end
     end
   end
 
