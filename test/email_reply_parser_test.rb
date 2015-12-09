@@ -115,6 +115,13 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match /Was this/, reply.fragments[1].to_s
   end
 
+  def test_multiline_and_quoted_reply_headers
+    reply = email :broken_reply_header
+
+    assert_match /^On the other hand/,   reply.fragments[0].to_s
+    assert_match /^On Wed, Dec 9/,   reply.fragments[1].to_s
+  end
+
   def test_deals_with_windows_line_endings
     reply = email :email_1_7
 

@@ -1,0 +1,29 @@
+This is the latest reply.
+
+The thread contains two previous replies, and the most recent reply header has a line break in it.
+
+If we don't patch the line break, the reply header ends up in THIS fragment, instead of in the quoted fragment.
+
+On the one hand, there could be a line in the reply starting with the word 'On.'
+
+On the other hand, it could happen TWICE!
+
+Stranger
+
+On Wed, Dec 9, Mister Example
+<mrmister@example.com>
+wrote:
+> Hey, Stranger,
+> It's mrmister again, and I hope you reply to me. I also hope this fragment has my reply header in it!
+>
+> -mrmister
+>
+> On Tue, 2011-03-01 at 18:02 +0530, Stranger Jones wrote:
+>> Hey, mrmister,
+>>
+>> I'm getting tired of writing fake email text.
+>>
+>> Stranger
+
+--
+My name is Stranger
