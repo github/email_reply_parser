@@ -9,6 +9,17 @@ require dir + '..' + 'lib' + 'email_reply_parser'
 EMAIL_FIXTURE_PATH = dir + 'emails'
 
 class EmailReplyParserTest < Test::Unit::TestCase
+  def test_encoding_should_be_maintained
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_1_1.txt").to_s
+    EmailReplyParser.read body
+    reply = email(:email_1_1)
+    fragments = reply.fragments
+    refute_predicate fragments, :empty?
+    fragments.each do |fragment|
+      assert_equal body.encoding, fragment.to_s.encoding
+    end
+  end
+
   def test_reads_simple_body
     reply = email(:email_1_1)
     assert_equal 3, reply.fragments.size
