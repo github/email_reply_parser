@@ -50,10 +50,10 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal [false, true, false, false, true],
       reply.fragments.map { |f| f.signature? }
 
-    assert_match /^Oh thanks.\n\nHaving/, reply.fragments[0].to_s
-    assert_match /^-A/, reply.fragments[1].to_s
-    assert_match /^On [^\:]+\:/, reply.fragments[2].to_s
-    assert_match /^_/, reply.fragments[4].to_s
+    assert_match(/^Oh thanks.\n\nHaving/, reply.fragments[0].to_s)
+    assert_match(/^-A/, reply.fragments[1].to_s)
+    assert_match(/^On [^\:]+\:/, reply.fragments[2].to_s)
+    assert_match(/^_/, reply.fragments[4].to_s)
   end
 
   def test_reads_bottom_post
@@ -68,10 +68,10 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
       reply.fragments.map { |f| f.hidden? }
 
     assert_equal "Hi,", reply.fragments[0].to_s
-    assert_match /^On [^\:]+\:/, reply.fragments[1].to_s
-    assert_match /^You can list/, reply.fragments[2].to_s
-    assert_match /^> /, reply.fragments[3].to_s
-    assert_match /^_/, reply.fragments[5].to_s
+    assert_match(/^On [^\:]+\:/, reply.fragments[1].to_s)
+    assert_match(/^You can list/, reply.fragments[2].to_s)
+    assert_match(/^> /, reply.fragments[3].to_s)
+    assert_match(/^_/, reply.fragments[5].to_s)
   end
 
   def test_reads_inline_replies
@@ -85,11 +85,11 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal [false, false, false, false, true, true, true],
       reply.fragments.map { |f| f.hidden? }
 
-    assert_match /^On [^\:]+\:/, reply.fragments[0].to_s
-    assert_match /^I will reply/, reply.fragments[1].to_s
+    assert_match(/^On [^\:]+\:/, reply.fragments[0].to_s)
+    assert_match(/^I will reply/, reply.fragments[1].to_s)
     assert_match "okay?", reply.fragments[2].to_s
-    assert_match /^and under this./, reply.fragments[3].to_s
-    assert_match /inline/, reply.fragments[4].to_s
+    assert_match(/^and under this./, reply.fragments[3].to_s)
+    assert_match(/inline/, reply.fragments[4].to_s)
     assert_equal "\n", reply.fragments[5].to_s
     assert_equal "--\nHey there, this is my signature\n", reply.fragments[6].to_s
   end
@@ -97,9 +97,9 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
   def test_recognizes_date_string_above_quote
     reply = email :email_1_4
 
-    assert_match /^Awesome/, reply.fragments[0].to_s
-    assert_match /^On/,      reply.fragments[1].to_s
-    assert_match /Loader/,   reply.fragments[1].to_s
+    assert_match(/^Awesome/, reply.fragments[0].to_s)
+    assert_match(/^On/,      reply.fragments[1].to_s)
+    assert_match(/Loader/,   reply.fragments[1].to_s)
   end
 
   def test_a_complex_body_with_only_one_fragment
@@ -115,23 +115,23 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal [false, false], reply.fragments.map { |f| f.quoted? }
     assert_equal [false, true], reply.fragments.map { |f| f.signature? }
     assert_equal [false, true], reply.fragments.map { |f| f.hidden? }
-    assert_match /^-- \nrick/, reply.fragments[1].to_s
+    assert_match(/^-- \nrick/, reply.fragments[1].to_s)
   end
 
   def test_deals_with_multiline_reply_headers
     reply = email :email_1_6
 
-    assert_match /^I get/,   reply.fragments[0].to_s
-    assert_match /^On/,      reply.fragments[1].to_s
-    assert_match /Was this/, reply.fragments[1].to_s
+    assert_match(/^I get/,   reply.fragments[0].to_s)
+    assert_match(/^On/,      reply.fragments[1].to_s)
+    assert_match(/Was this/, reply.fragments[1].to_s)
   end
 
   def test_deals_with_windows_line_endings
     reply = email :email_1_7
 
-    assert_match /:\+1:/,     reply.fragments[0].to_s
-    assert_match /^On/,       reply.fragments[1].to_s
-    assert_match /Steps 0-2/, reply.fragments[1].to_s
+    assert_match(/:\+1:/,     reply.fragments[0].to_s)
+    assert_match(/^On/,       reply.fragments[1].to_s)
+    assert_match(/Steps 0-2/, reply.fragments[1].to_s)
   end
 
   def test_handles_non_ascii_characters
@@ -193,14 +193,14 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
 
   def test_one_is_not_on
     reply = email("email_one_is_not_on")
-    assert_match /One outstanding question/, reply.fragments[0].to_s
-    assert_match /^On Oct 1, 2012/, reply.fragments[1].to_s
+    assert_match(/One outstanding question/, reply.fragments[0].to_s)
+    assert_match(/^On Oct 1, 2012/, reply.fragments[1].to_s)
   end
 
   def test_mulitple_on
     reply = email("greedy_on")
-    assert_match /^On your remote host/, reply.fragments[0].to_s
-    assert_match /^On 9 Jan 2014/, reply.fragments[1].to_s
+    assert_match(/^On your remote host/, reply.fragments[0].to_s)
+    assert_match(/^On 9 Jan 2014/, reply.fragments[1].to_s)
     assert_equal [false, true, false], reply.fragments.map { |f| f.quoted? }
     assert_equal [false, false, false], reply.fragments.map { |f| f.signature? }
     assert_equal [false, true, true], reply.fragments.map { |f| f.hidden? }
@@ -208,7 +208,7 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
 
   def test_pathological_emails
     t0 = Time.now
-    reply = email("pathological")
+    email("pathological")
     assert (Time.now - t0) < 1, "Took too long, upgrade to re2 gem."
   end
 
