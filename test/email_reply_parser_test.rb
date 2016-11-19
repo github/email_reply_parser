@@ -209,7 +209,7 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
   def test_pathological_emails
     t0 = Time.now
     email("pathological")
-    assert (Time.now - t0) < 1, "Took too long, upgrade to re2 gem."
+    assert (Time.now - t0) < 1, "Took too long, upgrade to re2 gem. See https://rubygems.org/gems/re2"
   end
 
   def test_doesnt_remove_signature_delimiter_in_mid_line
