@@ -1,0 +1,11 @@
+This is text from gmail set up with danish locale
+
+15. marts 2017 kl. 11.00 skrev John Doe <john@example.com>:
+
+> I am having an odd issue wherein suddenly port forwarding stopped
+> working in a particular scenario for me.  By default I have ssh set to
+> use the following config (my ~/.ssh/config file):
+> […]
+> ---
+> Reply to this email directly or view it on GitHub:
+> https://github.com/textmate/rmate/issues/29
