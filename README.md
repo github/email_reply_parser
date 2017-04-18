@@ -11,7 +11,7 @@ See the [Ruby docs][rubydocs] for more information.
 
 [rubydocs]: http://rubydoc.info/gems/email_reply_parser/
 
-##Usage
+## Usage
 
 To parse reply body:
 
