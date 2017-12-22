@@ -80,6 +80,7 @@ Gem::Specification.new do |s|
     test/emails/email_1_6.txt
     test/emails/email_1_7.txt
     test/emails/email_1_8.txt
+    test/emails/email_1_9.txt
     test/emails/email_2_1.txt
     test/emails/email_2_2.txt
     test/emails/email_BlackBerry.txt
@@ -98,4 +99,3 @@ Gem::Specification.new do |s|
   ## matches what you actually use.
   s.test_files = s.files.select { |path| path =~ /^test\/.*_test\.rb/ }
 end
-
