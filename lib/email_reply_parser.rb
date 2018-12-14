@@ -56,7 +56,7 @@ class EmailReplyParser
     # Emails have an Array of Fragments.
     attr_reader :fragments
 
-    def initialize()
+    def initialize
       @fragments = []
     end
 
