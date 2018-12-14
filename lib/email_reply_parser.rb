@@ -28,7 +28,6 @@ require 'strscan'
 # EmailReplyParser also attempts to figure out which of these blocks should
 # be hidden from users.
 #
-# [mail]: https://github.com/mikel/mail
 class EmailReplyParser
   VERSION = "0.5.9"
 
@@ -57,7 +56,7 @@ class EmailReplyParser
     # Emails have an Array of Fragments.
     attr_reader :fragments
 
-    def initialize
+    def initialize()
       @fragments = []
     end
 
@@ -75,7 +74,7 @@ class EmailReplyParser
     # text - A String email body.
     #
     # Returns this same Email instance.
-    def read(text)
+    def read(text, header_regex_arr = [])
       text = text.dup
 
       # Normalize line endings.
@@ -85,6 +84,11 @@ class EmailReplyParser
       # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
       if text =~ /^(?!On.*On\s.+?wrote:)(On\s(.+?)wrote:)$/m
         # Remove all new lines from the reply header.
+        text.gsub! $1, $1.gsub("\n", " ")
+      end
+
+      # Check for Outlook multi-line reply headers.
+      if text =~ /^(From:\s.+?Subject:.+?)$/m
         text.gsub! $1, $1.gsub("\n", " ")
       end
 
@@ -133,6 +137,13 @@ class EmailReplyParser
   private
     EMPTY = "".freeze
     SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)'
+    QUOTE_HEADER_REGEXS = [
+      # Standard
+      /^On.*wrote:$/,
+
+      #Outlook
+      /^(Subject|To|Sent|From):.*$/
+    ]
 
     begin
       require 're2'
@@ -188,7 +199,16 @@ class EmailReplyParser
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-      line =~ /^:etorw.*nO$/
+      QUOTE_HEADER_REGEXS.any? { |regexp| line.reverse =~ regexp }
+    end
+
+    # Detects if the given line matches a given regex.
+    #
+    # line - A String line of text from the email.
+    #
+    # Returns true if the line matches the visible break regex
+    def visible_break?(line)
+      line =~ schmur
     end
 
     # Builds the fragment string and reverses it, after all lines have been
