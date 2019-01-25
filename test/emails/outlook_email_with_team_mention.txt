@@ -1,0 +1,12 @@
+Outlook email reply with a team mention in the email body.
+
+From: CRM Comments [crm-comment@example.com]
+Sent: Friday, 23 March 2012 5:08 p.m.
+To: John S. Greene
+Cc: Jane Q. Codes
+Subject: Re: [@organization/team] Discussion about mail replies. (#1)
+
+Should the team mention from the subject line be parsed in the comment?
+
+> Here is quoted text.
+>
