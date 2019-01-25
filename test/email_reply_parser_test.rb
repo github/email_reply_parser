@@ -165,6 +165,11 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal "Outlook with a reply directly above line", EmailReplyParser.parse_reply(body)
   end
 
+  def test_parse_out_just_top_for_outlook_with_no_line_and_team_mention
+    body = IO.read EMAIL_FIXTURE_PATH.join("outlook_email_with_team_mention.txt").to_s
+    assert_equal "Outlook email reply with a team mention in the email body.", EmailReplyParser.parse_reply(body)
+  end
+
   def test_parse_out_sent_from_iPhone
     body = IO.read EMAIL_FIXTURE_PATH.join("email_iPhone.txt").to_s
     assert_equal "Here is another email", EmailReplyParser.parse_reply(body)
