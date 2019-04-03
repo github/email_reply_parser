@@ -164,19 +164,31 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-    REGARDS = EmailReplyParser.configuration.regards.map do |regard|
-      "(#{regard.reverse}$)"
-    end.join('|')
-
     SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)'
 
     begin
       require 're2'
       SIG_REGEX = RE2::Regexp.new(SIGNATURE)
-      REGARDS_REGEX = RE2::Regexp.new(REGARDS, case_sensitive: false)
     rescue LoadError
       SIG_REGEX = Regexp.new(SIGNATURE)
-      REGARDS_REGEX = Regexp.new(REGARDS, ignore_case: true)
+    end
+
+    # Regular expression for regards
+    #
+    # Returns a Regexp instance if regards are configured, otherwise it returns
+    # nil
+    def regards_regex
+      return nil if EmailReplyParser.configuration.regards.empty?
+      value = EmailReplyParser.configuration.regards.map do |regard|
+        "(#{regard.reverse}$)"
+      end.join('|')
+
+      begin
+        require 're2'
+        RE2::Regexp.new(value, case_sensitive: false)
+      rescue LoadError
+        Regexp.new(value, ignore_case: true)
+      end
     end
 
     ### Line-by-Line Parsing
@@ -204,10 +216,11 @@ class EmailReplyParser
         end
       end
 
-      # Mark the current Fragment as a regards if the current line is empty
-      # and the Fragment starts with a common regards indicator.
-      if @fragment && line == EMPTY
-        if REGARDS_REGEX.match @fragment.lines.last
+      # Mark the current Fragment as a regards if regards are configured and
+      # the current line is empty and the Fragment starts with a common regards
+      # indicator.
+      if regards_regex && @fragment && line == EMPTY
+        if regards_regex.match @fragment.lines.last
           @fragment.regards = true
           finish_fragment
         end

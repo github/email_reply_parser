@@ -9,10 +9,6 @@ require dir + '..' + 'lib' + 'email_reply_parser'
 EMAIL_FIXTURE_PATH = dir + 'emails'
 
 class EmailReplyParserTest < Test::Unit::TestCase
-  def test_default_configuration
-    assert_instance_of EmailReplyParser::Configuration, EmailReplyParser.configuration
-  end
-
   def test_configure_regards
     EmailReplyParser.configure do |config|
       config.regards = ['best regards']
@@ -235,9 +231,9 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
   end
 
   def test_kind_regards_signature
-    # EmailReplyParser.configure do |config|
-    #   config.regards = ['Kind regards']
-    # end
+    EmailReplyParser.configure do |config|
+      config.regards = ['Kind regards']
+    end
     reply = email('email_with_kind_regards')
     assert_match(/Thats a great idea/, reply.fragments[0].to_s)
     assert_equal [false, true], reply.fragments.map { |f| f.regards? }
