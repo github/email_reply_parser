@@ -132,16 +132,19 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-    REGARDS = '(neslih gilnev deM$)|(sdrager dniK$)|(sdrager mraW$)|(sdrager tseB$)'
+    REGARDS = ['med venlig hilsen', 'kind regards', 'warm regards', 'best regards'].map do |regard|
+      "(#{regard.reverse}$)"
+    end.join('|')
+
     SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)'
 
     begin
       require 're2'
       SIG_REGEX = RE2::Regexp.new(SIGNATURE)
-      REGARDS_REGEX = RE2::Regexp.new(REGARDS)
+      REGARDS_REGEX = RE2::Regexp.new(REGARDS, case_sensitive: false)
     rescue LoadError
       SIG_REGEX = Regexp.new(SIGNATURE)
-      REGARDS_REGEX = Regexp.new(REGARDS)
+      REGARDS_REGEX = Regexp.new(REGARDS, ignore_case: true)
     end
 
     ### Line-by-Line Parsing
