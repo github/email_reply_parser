@@ -32,6 +32,26 @@ require 'strscan'
 class EmailReplyParser
   VERSION = "0.5.9"
 
+  class << self
+    attr_writer :configuration
+
+    # Public: Configuration
+    #
+    # Returns a Configration instance .
+    #
+    def configuration
+      @configuration ||= Configuration.new
+    end
+
+    # Public: Configures EmailReplyParser
+    #
+    # block - a default configuration instance is exposed in the block
+    #
+    def configure
+      yield(configuration)
+    end
+  end
+
   # Public: Splits an email body into a list of Fragments.
   #
   # text - A String email body.
@@ -48,6 +68,18 @@ class EmailReplyParser
   # Returns a String.
   def self.parse_reply(text)
     self.read(text).visible_text
+  end
+
+  ### Configuration
+
+  # A Configuration instance.
+  class Configuration
+    # Configuration has an Array of regards
+    attr_accessor :regards
+
+    def initialize
+      @regards = []
+    end
   end
 
   ### Emails
@@ -132,7 +164,7 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-    REGARDS = ['med venlig hilsen', 'kind regards', 'warm regards', 'best regards'].map do |regard|
+    REGARDS = EmailReplyParser.configuration.regards.map do |regard|
       "(#{regard.reverse}$)"
     end.join('|')
 
