@@ -9,7 +9,7 @@ require dir + '..' + 'lib' + 'email_reply_parser'
 EMAIL_FIXTURE_PATH = dir + 'emails'
 
 class EmailReplyParserTest < Test::Unit::TestCase
-  def test_configure_regards
+  def test_regards_configuration
     EmailReplyParser.configure do |config|
       config.regards = ['best regards']
     end
