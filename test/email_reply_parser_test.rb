@@ -225,7 +225,7 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
   def test_kind_regards_signature
     reply = email('email_with_kind_regards')
     assert_match(/Thats a great idea/, reply.fragments[0].to_s)
-    assert_equal [false, true], reply.fragments.map { |f| f.signature? }
+    assert_equal [false, true], reply.fragments.map { |f| f.regards? }
   end
 
   def email(name)

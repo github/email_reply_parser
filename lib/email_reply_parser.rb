@@ -132,13 +132,16 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-    SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)|(neslih gilnev deM$)|(sdrager dniK$)|(sdrager mraW$)|(sdrager tseB$)'
+    REGARDS = '(neslih gilnev deM$)|(sdrager dniK$)|(sdrager mraW$)|(sdrager tseB$)'
+    SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)'
 
     begin
       require 're2'
       SIG_REGEX = RE2::Regexp.new(SIGNATURE)
+      REGARDS_REGEX = RE2::Regexp.new(REGARDS)
     rescue LoadError
       SIG_REGEX = Regexp.new(SIGNATURE)
+      REGARDS_REGEX = Regexp.new(REGARDS)
     end
 
     ### Line-by-Line Parsing
@@ -162,6 +165,15 @@ class EmailReplyParser
       if @fragment && line == EMPTY
         if SIG_REGEX.match @fragment.lines.last
           @fragment.signature = true
+          finish_fragment
+        end
+      end
+
+      # Mark the current Fragment as a regards if the current line is empty
+      # and the Fragment starts with a common regards indicator.
+      if @fragment && line == EMPTY
+        if REGARDS_REGEX.match @fragment.lines.last
+          @fragment.regards = true
           finish_fragment
         end
       end
@@ -217,7 +229,7 @@ class EmailReplyParser
       if @fragment
         @fragment.finish
         if !@found_visible
-          if @fragment.quoted? || @fragment.signature? ||
+          if @fragment.quoted? || @fragment.signature? ||  @fragment.regards? ||
               @fragment.to_s.strip == EMPTY
             @fragment.hidden = true
           else
@@ -235,7 +247,7 @@ class EmailReplyParser
   # Represents a group of paragraphs in the email sharing common attributes.
   # Paragraphs should get their own fragment if they are a quoted area or a
   # signature.
-  class Fragment < Struct.new(:quoted, :signature, :hidden)
+  class Fragment < Struct.new(:quoted, :signature, :hidden, :regards)
     # This is an Array of String lines of content.  Since the content is
     # reversed, this array is backwards, and contains reversed strings.
     attr_reader :lines,
@@ -245,7 +257,7 @@ class EmailReplyParser
       :content
 
     def initialize(quoted, first_line)
-      self.signature = self.hidden = false
+      self.signature = self.hidden = self.regards = false
       self.quoted = quoted
       @lines      = [first_line]
       @content    = nil
@@ -255,6 +267,7 @@ class EmailReplyParser
     alias quoted?    quoted
     alias signature? signature
     alias hidden?    hidden
+    alias regards?   regards
 
     # Builds the string content by joining the lines and reversing them.
     #
