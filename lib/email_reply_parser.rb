@@ -132,14 +132,8 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-    SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)'
-
-    begin
-      require 're2'
-      SIG_REGEX = RE2::Regexp.new(SIGNATURE)
-    rescue LoadError
-      SIG_REGEX = Regexp.new(SIGNATURE)
-    end
+    SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s+){1,3}ym morf tneS$)'
+    SIG_REGEX = Regexp.new(SIGNATURE)
 
     ### Line-by-Line Parsing
 
