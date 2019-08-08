@@ -209,6 +209,10 @@ class EmailReplyParser
     #
     def finish_fragment
       if @fragment
+        # Hit if there is an empty body above signature
+        if !@fragment.signature? && SIG_REGEX.match(@fragment.lines.last)
+          @fragment.signature = true
+        end
         @fragment.finish
         if !@found_visible
           if @fragment.quoted? || @fragment.signature? ||
