@@ -63,6 +63,7 @@ Gem::Specification.new do |s|
     test/emails/email_sig_delimiter_in_middle_of_line.txt
     test/emails/greedy_on.txt
     test/emails/pathological.txt
+    test/emails/email_with_kind_regards.txt
   ]
   # = MANIFEST =
 
