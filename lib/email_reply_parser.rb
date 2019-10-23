@@ -30,7 +30,7 @@ require 'strscan'
 #
 # [mail]: https://github.com/mikel/mail
 class EmailReplyParser
-  VERSION = "0.5.9"
+  VERSION = "0.5.10"
 
   # Public: Splits an email body into a list of Fragments.
   #
@@ -134,14 +134,8 @@ class EmailReplyParser
 
   private
     EMPTY = "".freeze
-    SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s*){1,3} ym morf tneS$)'
-
-    begin
-      require 're2'
-      SIG_REGEX = RE2::Regexp.new(SIGNATURE)
-    rescue LoadError
-      SIG_REGEX = Regexp.new(SIGNATURE)
-    end
+    SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s+){1,3}ym morf tneS$)'
+    SIG_REGEX = Regexp.new(SIGNATURE)
 
     ### Line-by-Line Parsing
 
@@ -190,8 +184,9 @@ class EmailReplyParser
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-
-      line =~ /^:etorw.*nO$/ || line =~/\d{2}:\d{2}-TMG \d{2}:\d{2} \d{2}-\d{2}-\d{4}$/
+      line =~ /^:etorw.*nO$/ ||
+        line =~/\d{2}:\d{2}-TMG \d{2}:\d{2} \d{2}-\d{2}-\d{4}$/ ||
+        line =~ /^.*:(morF|tneS|oT|tcejbuS)$/
     end
 
     # Builds the fragment string and reverses it, after all lines have been
