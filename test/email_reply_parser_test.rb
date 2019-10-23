@@ -196,6 +196,19 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal EmailReplyParser.read(body).visible_text, EmailReplyParser.parse_reply(body)
   end
 
+  def test_gmail_reply_format
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_1_9.txt").to_s
+
+    assert_equal "Hi,", EmailReplyParser.parse_reply(body)
+  end
+
+  def test_gmail_reply_format_when_quoted
+    body = IO.read EMAIL_FIXTURE_PATH.join("email_1_9_quoted.txt").to_s
+    expected_body = "Hi,\n\n2017-12-22 10:35 GMT-02:00 Abhishek Kona <abhishek@kona.com>:\n\n> Hi folks\n>\n> Ruby is awesome!\n\nDo you agree?"
+
+    assert_equal expected_body, EmailReplyParser.parse_reply(body)
+  end
+
   def test_one_is_not_on
     reply = email("email_one_is_not_on")
     assert_match(/One outstanding question/, reply.fragments[0].to_s)

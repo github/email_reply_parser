@@ -83,7 +83,9 @@ class EmailReplyParser
 
       # Check for multi-line reply headers. Some clients break up
       # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
-      if text =~ /^(?!On.*On\s.+?wrote:)(On\s(.+?)wrote:)$/m
+      # Some clients, like Gmail, is using another format.
+      # Eg. "DATETIME NAME <EMAIL>:"
+      if text =~ /^(?!On.*On\s.+?wrote:)(On\s(.+?)wrote:)$/m || text =~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2} GMT.?\d{2}:\d{2} .*:)$/m
         # Remove all new lines from the reply header.
         text.gsub! $1, $1.gsub("\n", " ")
       end
@@ -182,7 +184,9 @@ class EmailReplyParser
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-      line =~ /^:etorw.*nO$/ || line =~ /^.*:(morF|tneS|oT|tcejbuS)$/
+      line =~ /^:etorw.*nO$/ ||
+        line =~/\d{2}:\d{2}-TMG \d{2}:\d{2} \d{2}-\d{2}-\d{4}$/ ||
+        line =~ /^.*:(morF|tneS|oT|tcejbuS)$/
     end
 
     # Builds the fragment string and reverses it, after all lines have been
