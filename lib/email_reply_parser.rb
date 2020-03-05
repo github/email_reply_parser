@@ -65,7 +65,7 @@ class EmailReplyParser
     #
     # Returns a String.
     def visible_text
-      fragments.select{|f| !f.hidden?}.map{|f| f.to_s}.join("\n").rstrip
+      fragments.reject(&:hidden?).map!(&:to_s).join("\n").tap(&:rstrip!)
     end
 
     # Splits the given text into a list of Fragments.  This is roughly done by
