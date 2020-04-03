@@ -1,2 +1,4 @@
 pkg
 .ruby-version
+.byebug_history
+.idea
