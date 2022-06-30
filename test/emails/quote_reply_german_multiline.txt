@@ -1,0 +1,7 @@
+This is a reply with German quote multiline
+
+Am Mo., 4. Juli 2022 um 08:13 Uhr schrieb Rick Sanchez <
+rick.sanchez@example.com>:
+
+> Hello this is a test
+>

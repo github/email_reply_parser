@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rubygems'
 require 'test/unit'
 require 'pathname'
@@ -202,13 +204,63 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_match(/^On Oct 1, 2012/, reply.fragments[1].to_s)
   end
 
-  def test_mulitple_on
+  def test_multiple_on
     reply = email("greedy_on")
     assert_match(/^On your remote host/, reply.fragments[0].to_s)
     assert_match(/^On 9 Jan 2014/, reply.fragments[1].to_s)
     assert_equal [false, true, false], reply.fragments.map { |f| f.quoted? }
     assert_equal [false, false, false], reply.fragments.map { |f| f.signature? }
     assert_equal [false, true, true], reply.fragments.map { |f| f.hidden? }
+  end
+
+  def test_multiple_replies
+    reply = email("email_multiple_replies")
+    assert_equal("TAKE 3 - testing once again", reply.fragments[0].to_s)
+  end
+
+  def test_quote_reply_spanish
+    reply = email("quote_reply_spanish")
+    assert_equal("This is a reply with Spanish quote", reply.fragments[0].to_s)
+  end
+ 
+  def test_quote_reply_spanish_multiline
+    reply = email("quote_reply_spanish_multiline")
+    assert_equal("This is a reply with Spanish quote multiline", reply.fragments[0].to_s)
+  end
+
+  def test_email_reply_french
+    reply = email("quote_reply_french")
+    assert_equal("This is a reply with French quote", reply.fragments[0].to_s)
+  end
+
+  def test_email_reply_french_multiline
+    reply = email("quote_reply_french_multiline")
+    assert_equal("This is a reply with French quote multiline", reply.fragments[0].to_s)
+  end
+
+  def test_email_multiple_french
+    reply = email("quote_reply_french_big")
+    assert_equal("Outlook with a reply directly above line", reply.fragments[0].to_s)
+  end
+
+  def test_email_reply_german
+    reply = email("quote_reply_german")
+    assert_equal("This is a reply with German quote", reply.fragments[0].to_s)
+  end
+
+  def test_email_reply_german_multiline
+    reply = email("quote_reply_german_multiline")
+    assert_equal("This is a reply with German quote multiline", reply.fragments[0].to_s)
+  end
+
+  def test_email_reply_italian
+    reply = email("quote_reply_italian")
+    assert_equal("This is a reply with Italian quote", reply.fragments[0].to_s)
+  end
+
+  def test_email_reply_italian_multiline
+    reply = email("quote_reply_italian_multiline")
+    assert_equal("This is a reply with Italian quote multiline", reply.fragments[0].to_s)
   end
 
   def test_pathological_emails

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'strscan'
 
 # EmailReplyParser is a small library to parse plain text email content.  The
@@ -80,12 +82,14 @@ class EmailReplyParser
 
       # Normalize line endings.
       text.gsub!("\r\n", "\n")
-
+      
       # Check for multi-line reply headers. Some clients break up
       # the "On DATE, NAME <EMAIL> wrote:" line into multiple lines.
-      if text =~ /^(?!On.*On\s.+?wrote:)(On\s(.+?)wrote:)$/m
-        # Remove all new lines from the reply header.
-        text.gsub! $1, $1.gsub("\n", " ")
+      MULTILINE_QUOTE_HEADER_EXPRESSIONS.each do |expr|
+        if text =~ expr
+          # Remove all new lines from the reply header.
+          text.gsub! $1, $1.gsub("\n", " ")
+        end
       end
 
       # Some users may reply directly above a line of underscores.
@@ -134,6 +138,33 @@ class EmailReplyParser
     EMPTY = "".freeze
     SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s+){1,3}ym morf tneS$)'
     SIG_REGEX = Regexp.new(SIGNATURE)
+    MULTILINE_QUOTE_HEADER_EXPRESSIONS = [
+      # English
+      /(^On\s((?!On).)*wrote:$)$/m,
+      # Spanish
+      /(?!El.*El\s.+?escribi.*\s*:)(El\s(.+?)escribi.*\s*:)/m,
+      # French
+      /(?!Le.*Le\s.+?a .*crit[a-zA-Z0-9.:;<>()&@ -]*:)(Le\s(.+?)a .*crit[a-zA-Z0-9.:;<>()&@ -]*:)/m,
+      # German
+      /(?!Am.*Am\s.+?schrieb.*:)(Am\s(.+?)schrieb.*:)/m,
+      # Italian
+      /(?!Il.*Il\s.+?scritto.*:)(Il[\s\S]+?(.+?)scritto:)/m
+    ]
+    QUOTE_HEADER_REGULAR_EXPRESSIONS = [
+      # English
+      /^On.*wrote:$/,
+      /^(From|Sent|To|Subject):.*$/m,
+      # Spanish
+      /\s*El.*a las.*escribi.*\s*:$/,
+      /^(De|Enviado|Para|Asunto):.*$/m,
+      # French
+      /Le.*a .*crit.*[> ]:$/m,
+      /^(De|A|Envoyé|Objet)\s*:.*$/m,
+      # German
+      /[a-zA-Z]{2,5}.*schrieb.*:$/,
+      # Italian
+      /^Il.+?ha scritto:$/
+    ]
 
     ### Line-by-Line Parsing
 
@@ -182,7 +213,8 @@ class EmailReplyParser
     #
     # Returns true if the line is a valid header, or false.
     def quote_header?(line)
-      line =~ /^:etorw.*nO$/ || line =~ /^.*:(morF|tneS|oT|tcejbuS)$/
+      actual_line = line.reverse
+      QUOTE_HEADER_REGULAR_EXPRESSIONS.any? { |regexp| actual_line =~ regexp }
     end
 
     # Builds the fragment string and reverses it, after all lines have been
