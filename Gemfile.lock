@@ -2,12 +2,14 @@ GEM
   remote: https://rubygems.org/
   specs:
     rake (13.0.6)
+    strscan (3.0.6)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  rake
+  rake (~> 13.0, >= 13.0.6)
+  strscan (~> 3.0)
 
 BUNDLED WITH
    1.17.2
