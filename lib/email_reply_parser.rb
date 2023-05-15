@@ -147,9 +147,9 @@ class EmailReplyParser
       line.chomp!("\n")
       line.lstrip! unless SIG_REGEX.match(line)
 
-      # We're looking for leading `>`'s to see if this line is part of a
+      # We're looking for a leading `>` to see if this line is part of a
       # quoted Fragment.
-      is_quoted = !!(line =~ /(>+)$/)
+      is_quoted = !!(line =~ /(>)$/)
 
       # Mark the current Fragment as a signature if the current line is empty
       # and the Fragment starts with a common signature indicator.
