@@ -2,6 +2,7 @@ require 'rubygems'
 require 'test/unit'
 require 'pathname'
 require 'pp'
+require 'timeout'
 
 dir = Pathname.new File.expand_path(File.dirname(__FILE__))
 require dir + '..' + 'lib' + 'email_reply_parser'
@@ -220,6 +221,12 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
   def test_doesnt_remove_signature_delimiter_in_mid_line
     reply = email(:email_sig_delimiter_in_middle_of_line)
     assert_equal 1, reply.fragments.size
+  end
+
+  def test_long_quote_processing_completes
+    reply = Timeout.timeout(1) { email(:email_long_quote) }
+
+    assert_equal 5, reply.fragments.size
   end
 
   def email(name)
