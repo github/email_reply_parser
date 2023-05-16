@@ -32,6 +32,26 @@ require 'strscan'
 class EmailReplyParser
   VERSION = "0.5.10"
 
+  class << self
+    attr_writer :configuration
+
+    # Public: Configuration
+    #
+    # Returns a Configration instance .
+    #
+    def configuration
+      @configuration ||= Configuration.new
+    end
+
+    # Public: Configures EmailReplyParser
+    #
+    # block - a default configuration instance is exposed in the block
+    #
+    def configure
+      yield(configuration)
+    end
+  end
+
   # Public: Splits an email body into a list of Fragments.
   #
   # text - A String email body.
@@ -48,6 +68,18 @@ class EmailReplyParser
   # Returns a String.
   def self.parse_reply(text)
     self.read(text).visible_text
+  end
+
+  ### Configuration
+
+  # A Configuration instance.
+  class Configuration
+    # Configuration has an Array of regards
+    attr_accessor :regards
+
+    def initialize
+      @regards = []
+    end
   end
 
   ### Emails
@@ -135,6 +167,24 @@ class EmailReplyParser
     SIGNATURE = '(?m)(--\s*$|__\s*$|\w-$)|(^(\w+\s+){1,3}ym morf tneS$)'
     SIG_REGEX = Regexp.new(SIGNATURE)
 
+    # Regular expression for regards
+    #
+    # Returns a Regexp instance if regards are configured, otherwise it returns
+    # nil
+    def regards_regex
+      return nil if EmailReplyParser.configuration.regards.empty?
+      value = EmailReplyParser.configuration.regards.map do |regard|
+        "(#{regard.reverse}$)"
+      end.join('|')
+
+      begin
+        require 're2'
+        RE2::Regexp.new(value, case_sensitive: false)
+      rescue LoadError
+        Regexp.new(value, ignore_case: true)
+      end
+    end
+
     ### Line-by-Line Parsing
 
     # Scans the given line of text and figures out which fragment it belongs
@@ -156,6 +206,16 @@ class EmailReplyParser
       if @fragment && line == EMPTY
         if SIG_REGEX.match @fragment.lines.last
           @fragment.signature = true
+          finish_fragment
+        end
+      end
+
+      # Mark the current Fragment as a regards if regards are configured and
+      # the current line is empty and the Fragment starts with a common regards
+      # indicator.
+      if regards_regex && @fragment && line == EMPTY
+        if regards_regex.match @fragment.lines.last
+          @fragment.regards = true
           finish_fragment
         end
       end
@@ -211,7 +271,7 @@ class EmailReplyParser
       if @fragment
         @fragment.finish
         if !@found_visible
-          if @fragment.quoted? || @fragment.signature? ||
+          if @fragment.quoted? || @fragment.signature? ||  @fragment.regards? ||
               @fragment.to_s.strip == EMPTY
             @fragment.hidden = true
           else
@@ -229,7 +289,7 @@ class EmailReplyParser
   # Represents a group of paragraphs in the email sharing common attributes.
   # Paragraphs should get their own fragment if they are a quoted area or a
   # signature.
-  class Fragment < Struct.new(:quoted, :signature, :hidden)
+  class Fragment < Struct.new(:quoted, :signature, :hidden, :regards)
     # This is an Array of String lines of content.  Since the content is
     # reversed, this array is backwards, and contains reversed strings.
     attr_reader :lines,
@@ -239,7 +299,7 @@ class EmailReplyParser
       :content
 
     def initialize(quoted, first_line)
-      self.signature = self.hidden = false
+      self.signature = self.hidden = self.regards = false
       self.quoted = quoted
       @lines      = [first_line]
       @content    = nil
@@ -249,6 +309,7 @@ class EmailReplyParser
     alias quoted?    quoted
     alias signature? signature
     alias hidden?    hidden
+    alias regards?   regards
 
     # Builds the string content by joining the lines and reversing them.
     #
