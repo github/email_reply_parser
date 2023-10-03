@@ -11,7 +11,7 @@ EMAIL_FIXTURE_PATH = dir + 'emails'
 
 class EmailReplyParserTest < Test::Unit::TestCase
   def test_encoding_should_be_maintained
-    body = IO.read EMAIL_FIXTURE_PATH.join("email_1_1.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("email_1_1.txt").to_s
     EmailReplyParser.read body
     reply = email(:email_1_1)
     fragments = reply.fragments
@@ -152,48 +152,48 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
   end
 
   def test_parse_out_just_top_for_outlook_reply
-    body = IO.read EMAIL_FIXTURE_PATH.join("email_2_1.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("email_2_1.txt").to_s
     assert_equal "Outlook with a reply", EmailReplyParser.parse_reply(body)
   end
 
   def test_parse_out_just_top_for_outlook_with_reply_directly_above_line
-    body = IO.read EMAIL_FIXTURE_PATH.join("email_2_2.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("email_2_2.txt").to_s
     assert_equal "Outlook with a reply directly above line", EmailReplyParser.parse_reply(body)
   end
 
   def test_parse_out_just_top_for_outlook_with_no_line
-    body = IO.read EMAIL_FIXTURE_PATH.join("email_2_3.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("email_2_3.txt").to_s
     assert_equal "Outlook with a reply directly above line", EmailReplyParser.parse_reply(body)
   end
 
   def test_parse_out_sent_from_iPhone
-    body = IO.read EMAIL_FIXTURE_PATH.join("email_iPhone.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("email_iPhone.txt").to_s
     assert_equal "Here is another email", EmailReplyParser.parse_reply(body)
   end
 
   def test_parse_out_sent_from_BlackBerry
-    body = IO.read EMAIL_FIXTURE_PATH.join("email_BlackBerry.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("email_BlackBerry.txt").to_s
     assert_equal "Here is another email", EmailReplyParser.parse_reply(body)
   end
 
   def test_parse_out_send_from_multiword_mobile_device
-    body = IO.read EMAIL_FIXTURE_PATH.join("email_multi_word_sent_from_my_mobile_device.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("email_multi_word_sent_from_my_mobile_device.txt").to_s
     assert_equal "Here is another email", EmailReplyParser.parse_reply(body)
   end
 
   def test_do_not_parse_out_send_from_in_regular_sentence
-    body = IO.read EMAIL_FIXTURE_PATH.join("email_sent_from_my_not_signature.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("email_sent_from_my_not_signature.txt").to_s
     assert_equal "Here is another email\n\nSent from my desk, is much easier then my mobile phone.", EmailReplyParser.parse_reply(body)
   end
 
   def test_retains_bullets
-    body = IO.read EMAIL_FIXTURE_PATH.join("email_bullets.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("email_bullets.txt").to_s
     assert_equal "test 2 this should list second\n\nand have spaces\n\nand retain this formatting\n\n\n   - how about bullets\n   - and another",
       EmailReplyParser.parse_reply(body)
   end
 
   def test_parse_reply
-    body = IO.read EMAIL_FIXTURE_PATH.join("email_1_2.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("email_1_2.txt").to_s
     assert_equal EmailReplyParser.read(body).visible_text, EmailReplyParser.parse_reply(body)
   end
 
@@ -230,7 +230,7 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
   end
 
   def email(name)
-    body = IO.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
+    body = File.read EMAIL_FIXTURE_PATH.join("#{name}.txt").to_s
     EmailReplyParser.read body
   end
 end
