@@ -186,6 +186,15 @@ I am currently using the Java HTTP API.\n", reply.fragments[0].to_s
     assert_equal "Here is another email\n\nSent from my desk, is much easier then my mobile phone.", EmailReplyParser.parse_reply(body)
   end
 
+  def test_parse_sent_from_inbox
+    reply = email(:email_sent_from_inbox)
+    assert_equal [false, false, true],
+      reply.fragments.map { |f| f.signature? }
+    assert_equal [false, true, true],
+      reply.fragments.map { |f| f.hidden? }
+    assert_equal "Hi,\nThis is a test reply from Inbox.", reply.visible_text
+  end
+
   def test_retains_bullets
     body = File.read EMAIL_FIXTURE_PATH.join("email_bullets.txt").to_s
     assert_equal "test 2 this should list second\n\nand have spaces\n\nand retain this formatting\n\n\n   - how about bullets\n   - and another",
